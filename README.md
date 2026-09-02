@@ -4,6 +4,14 @@ Mini aplicación web para estudiar y practicar **hiragana japonés mediante flas
 
 Está diseñada para sesiones rápidas de estudio y práctica, con diferentes modos de juego, seguimiento del progreso y selección personalizada de los caracteres.
 
+Todo vive en **un solo archivo HTML**: sin dependencias, sin instalación, sin conexión y sin enviar nada a ningún servidor.
+
+![HTML](https://img.shields.io/badge/HTML-1%20archivo-orange)
+![Sin dependencias](https://img.shields.io/badge/dependencias-ninguna-brightgreen)
+![Offline](https://img.shields.io/badge/offline-sí-blue)
+
+Puedes probarlo online aquí 👉 https://gabom88.github.io/hiragana/
+
 ## ✨ Características
 
 ### 📖 Modo Estudio
@@ -15,6 +23,7 @@ Modo de práctica sin límite de tiempo.
 
   * `か → ka`
   * `ka → か`
+  * Mezclado
 * Opción múltiple.
 * Respuesta escrita mediante teclado.
 * Repetición de los caracteres que se fallan.
@@ -77,6 +86,8 @@ Cuando se utiliza la respuesta escrita, la aplicación acepta diferentes romaniz
 * `fu` / `hu`
 * `ja` / `jya`
 
+Las preguntas en dirección `ka → か` siempre se responden por opción múltiple, ya que escribir kana requeriría un teclado japonés.
+
 ### 🔤 Grupos de caracteres
 
 La aplicación incluye tres grupos:
@@ -99,18 +110,29 @@ Incluye lectura en voz alta utilizando la API de síntesis de voz del navegador.
 * Puede activarse o desactivarse desde Ajustes.
 * También permite escuchar individualmente cualquier carácter desde el explorador de caracteres.
 
+Depende de las voces instaladas en el sistema operativo. En equipos sin voz japonesa disponible, la reproducción simplemente no suena.
+
 ### 📚 Explorador de caracteres
 
 Permite consultar todos los caracteres disponibles.
 
-Al seleccionar uno se muestra:
+Al seleccionar uno se abre su ficha, que muestra:
 
-* Hiragana en tamaño grande.
+* El carácter dentro de una **cuadrícula de práctica** estilo *renshūchō*, con la cruz punteada de referencia.
+* **Orden de trazos numerado** o forma impresa, alternables con un selector. La preferencia se guarda.
 * Romanización.
 * Nivel actual.
 * Número de aciertos.
 * Número de errores.
 * Reproducción de pronunciación.
+
+Los números de trazo aparecen únicamente en esta ficha. Las flashcards usan siempre la tipografía japonesa del sistema, sin numeración, para no dar pistas visuales durante la práctica.
+
+### 🎚️ Contraste de la cuadrícula
+
+El grosor visual de la cuadrícula es configurable desde Ajustes, con tres niveles: **tenue, media y marcada**, y una vista previa en vivo.
+
+La tinta de las líneas se invierte según el tema —negra en claro, blanca en oscuro— de modo que la cuadrícula se mantiene legible en modo oscuro en lugar de desaparecer.
 
 ### 🏆 Récords
 
@@ -144,6 +166,8 @@ La aplicación guarda automáticamente:
 
 Utiliza el almacenamiento disponible del navegador, con `localStorage` como alternativa, por lo que **no necesita una base de datos ni un servidor**.
 
+No hay cuentas ni analítica, y no se realiza ninguna petición de red. Borrar los datos del sitio en el navegador elimina el avance.
+
 ## 🚀 Uso
 
 No requiere instalación ni dependencias.
@@ -153,10 +177,6 @@ Simplemente abre:
 ```text
 hiragana flashcards.html
 ```
-
-en un navegador moderno.
-
-También puede alojarse directamente como una página estática, por ejemplo mediante **GitHub Pages**.
 
 ## 🛠️ Tecnologías
 
@@ -170,9 +190,11 @@ El proyecto está construido utilizando únicamente tecnologías web estándar:
 
 No utiliza frameworks ni librerías externas.
 
+La fuente de orden de trazos va **subseteada e incrustada en base64** dentro del CSS: 81 glifos —los kana más ゃゅょっ y el alargador ー— en formato WOFF. Por eso la aplicación funciona sin conexión y sigue siendo un único archivo, de aproximadamente 84 KB en total.
+
 ## 📱 Diseño
 
-La interfaz está diseñada para funcionar especialmente bien en dispositivos móviles, pero también puede utilizarse desde un ordenador.
+La interfaz está diseñada para funcionar especialmente bien en dispositivos móviles, pero también puede utilizarse desde un ordenador. Sigue convenciones visuales de iOS.
 
 Incluye:
 
@@ -182,6 +204,7 @@ Incluye:
 * Animaciones y retroalimentación visual.
 * Soporte para `prefers-reduced-motion`.
 * Adaptación automática al modo oscuro.
+* Respeto del `safe-area-inset` en pantallas con notch.
 
 La aplicación limita el contenido principal a un ancho de aproximadamente 520 px para conservar una experiencia similar a una aplicación móvil.
 
@@ -219,8 +242,10 @@ El objetivo del proyecto es proporcionar una herramienta **simple, rápida y sin
 
 No requiere cuentas, conexión a internet, servidores ni sistemas externos para guardar el progreso.
 
----
+## 🙏 Créditos
 
+Los diagramas de orden de trazos provienen de **KanjiStrokeOrderFont**, de Ulrich Apel y los proyectos Wadoku y AAAA, distribuida bajo una licencia de tipo BSD. El subset incrustado conserva ese crédito dentro de la propia aplicación, y el `LICENCE.txt` original se incluye en el repositorio.
 
+## 📄 Licencia
 
-Este proyecto puede modificarse y adaptarse libremente según las necesidades de estudio.
+El código de la aplicación puede modificarse y adaptarse libremente según las necesidades de estudio. La fuente incrustada mantiene su licencia original.
