@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F2F7">
+<title>Hiragana</title>
+<style>
+:root{
+  --bg:#F2F2F7;
+  --surface:#FFFFFF;
+  --surface-2:#FFFFFF;
+  --label:#000000;
+  --label-2:rgba(60,60,67,.60);
+  --label-3:rgba(60,60,67,.30);
+  --separator:rgba(60,60,67,.20);
+  --fill:rgba(118,118,128,.12);
+  --fill-2:rgba(118,118,128,.20);
+  --accent:#007AFF;
+  --green:#34C759;
+  --red:#FF3B30;
+  --orange:#FF9500;
+  --yellow:#FFCC00;
+  --shadow:0 1px 2px rgba(0,0,0,.05);
+  --card-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+[data-theme="dark"]{
+  --bg:#000000;
+  --surface:#1C1C1E;
+  --surface-2:#2C2C2E;
+  --label:#FFFFFF;
+  --label-2:rgba(235,235,245,.60);
+  --label-3:rgba(235,235,245,.30);
+  --separator:rgba(84,84,88,.65);
+  --fill:rgba(118,118,128,.24);
+  --fill-2:rgba(118,118,128,.36);
+  --accent:#0A84FF;
+  --green:#30D158;
+  --red:#FF453A;
+  --orange:#FF9F0A;
+  --yellow:#FFD60A;
+  --shadow:none;
+  --card-shadow:0 8px 24px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--label);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-size:17px;
+  line-height:1.35;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+}
+button{font-family:inherit;font-size:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font-family:inherit;color:inherit}
+.kana-font{font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","MS Gothic",sans-serif}
+
+#app{max-width:520px;margin:0 auto;min-height:100%;padding:0 16px env(safe-area-inset-bottom) 16px;padding-top:env(safe-area-inset-top)}
+.screen{display:none;padding-bottom:40px;animation:fade .22s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Navegación */
+.nav{display:flex;align-items:center;justify-content:space-between;height:52px;margin-top:4px}
+.nav-btn{color:var(--accent);display:flex;align-items:center;gap:3px;padding:6px 4px;margin-left:-4px;font-size:17px;border-radius:8px}
+.nav-btn:active{opacity:.4}
+.nav-title{font-size:17px;font-weight:600}
+.nav-right{min-width:60px;text-align:right;color:var(--accent)}
+.chev{width:11px;height:11px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(135deg);display:inline-block}
+
+h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
+.sub{color:var(--label-2);font-size:15px;margin-bottom:22px}
+.section-head{font-size:13px;color:var(--label-2);margin:26px 4px 7px}
+
+/* Listas agrupadas */
+.list{background:var(--surface);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.row{display:flex;align-items:center;gap:12px;padding:13px 16px;width:100%;text-align:left;position:relative}
+.row + .row::before{content:"";position:absolute;top:0;left:60px;right:0;height:1px;background:var(--separator)}
+.row.no-icon + .row.no-icon::before{left:16px}
+.row:active{background:var(--fill)}
+.row-icon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#fff;font-size:16px;flex:none}
+.row-body{flex:1;min-width:0}
+.row-title{font-size:17px}
+.row-desc{font-size:13px;color:var(--label-2);margin-top:1px}
+.row-value{color:var(--label-2);font-size:16px}
+.row .chev{color:var(--label-3);transform:rotate(-45deg);width:9px;height:9px;border-width:2px;border-left:0;border-top:0}
+
+/* Progreso home */
+.hero{background:var(--surface);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.hero-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.hero-num{font-size:22px;font-weight:600}
+.hero-label{font-size:13px;color:var(--label-2)}
+.track{height:8px;border-radius:4px;background:var(--fill-2);overflow:hidden}
+.track > i{display:block;height:100%;background:var(--green);border-radius:4px;transition:width .5s ease}
+
+/* Controles */
+.seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
+.seg button{flex:1;padding:7px 4px;border-radius:7px;font-size:14px;font-weight:500;transition:background .15s}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+[data-theme="dark"] .seg button[aria-pressed="true"]{background:#636366}
+
+.switch{width:51px;height:31px;border-radius:16px;background:var(--fill-2);position:relative;transition:background .2s;flex:none}
+.switch[aria-checked="true"]{background:var(--green)}
+.switch i{position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+.switch[aria-checked="true"] i{transform:translateX(20px)}
+
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper input{width:72px;text-align:center;font-size:17px;font-weight:600;padding:8px;border-radius:9px;border:0;background:var(--fill);-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.step-btn{width:34px;height:34px;border-radius:50%;background:var(--fill);font-size:20px;font-weight:500;display:grid;place-items:center;line-height:1}
+.step-btn:active{background:var(--fill-2)}
+
+.btn{display:block;width:100%;padding:15px;border-radius:12px;background:var(--accent);color:#fff;font-size:17px;font-weight:600;text-align:center;transition:transform .1s,opacity .1s}
+.btn:active{transform:scale(.975);opacity:.85}
+.btn.secondary{background:var(--fill);color:var(--accent)}
+.btn.quiet{background:none;color:var(--accent);font-weight:400}
+.btn.danger{background:var(--fill);color:var(--red)}
+.btn + .btn{margin-top:10px}
+
+/* HUD de juego */
+.hud{display:flex;align-items:center;justify-content:space-between;height:52px;margin-top:4px;gap:12px}
+.hud-stat{text-align:center}
+.hud-num{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.hud-cap{font-size:11px;color:var(--label-2)}
+.hud-num.warn{color:var(--red)}
+.timerbar{height:6px;border-radius:3px;background:var(--fill-2);overflow:hidden;margin-bottom:20px}
+.timerbar > i{display:block;height:100%;background:var(--accent);border-radius:3px;transform-origin:left}
+.timerbar > i.low{background:var(--red)}
+
+/* Tarjeta */
+.card{background:var(--surface);border-radius:20px;box-shadow:var(--card-shadow);display:grid;place-items:center;text-align:center;padding:26px 20px;min-height:210px;position:relative;overflow:hidden}
+.card .kana{font-size:104px;line-height:1.1;font-weight:400}
+.card .kana.roman{font-size:64px;font-weight:600;letter-spacing:-1px}
+.card .ask{position:absolute;top:14px;left:0;right:0;font-size:13px;color:var(--label-2)}
+.card.good{box-shadow:0 0 0 3px var(--green),var(--card-shadow)}
+.card.bad{box-shadow:0 0 0 3px var(--red),var(--card-shadow)}
+.card .reveal{position:absolute;bottom:12px;left:0;right:0;font-size:15px;color:var(--label-2)}
+@keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(4px)}50%{transform:translateX(-4px)}}
+.card.bad{animation:shake .35s}
+
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.opt{background:var(--surface);border-radius:14px;padding:18px 8px;font-size:22px;font-weight:500;box-shadow:var(--shadow);transition:transform .1s;position:relative}
+.opt .num{position:absolute;top:6px;left:9px;font-size:11px;color:var(--label-3);font-weight:600}
+.opt:active{transform:scale(.97)}
+.opt.correct{background:var(--green);color:#fff}
+.opt.wrong{background:var(--red);color:#fff}
+.opt:disabled{cursor:default}
+.opt.kana-font{font-size:34px}
+
+/* Resultados */
+.score-wrap{text-align:center;padding:14px 0 4px}
+.score-num{font-size:64px;font-weight:700;letter-spacing:-2px;font-variant-numeric:tabular-nums;line-height:1}
+.score-cap{font-size:15px;color:var(--label-2);margin-top:2px}
+.record{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;color:var(--orange);background:rgba(255,149,0,.14);padding:5px 12px;border-radius:20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;background:var(--surface);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.chip{display:flex;align-items:center;gap:6px;background:var(--fill);border-radius:9px;padding:6px 10px;font-size:15px}
+.chip b{font-size:20px;font-weight:400}
+
+/* Mapa de dominio */
+.map{display:flex;flex-wrap:wrap;gap:6px;background:var(--surface);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+.cell{width:52px;height:52px;border-radius:10px;display:grid;place-items:center;background:var(--fill);gap:0;padding-top:2px}
+.cell span{font-size:22px;line-height:1.1}
+.cell small{font-size:10px;color:var(--label-2);line-height:1}
+.m1{background:rgba(255,59,48,.18)} .m2{background:rgba(255,149,0,.22)}
+.m3{background:rgba(255,204,0,.28)} .m4{background:rgba(52,199,89,.25)}
+.m5{background:rgba(52,199,89,.55)}
+.m5 small,.m4 small{color:var(--label-2)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin:10px 4px 0;font-size:12px;color:var(--label-2);align-items:center}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:-2px}
+
+/* Respuesta escrita */
+.answer-form{display:flex;gap:10px;margin-top:18px}
+.answer-form input{flex:1;min-width:0;padding:16px;border-radius:14px;border:0;background:var(--surface);box-shadow:var(--shadow);font-size:22px;font-weight:500;text-align:center;letter-spacing:.5px}
+.answer-form input::placeholder{color:var(--label-3);font-weight:400}
+.answer-form input.correct{background:var(--green);color:#fff}
+.answer-form input.wrong{background:var(--red);color:#fff}
+.answer-form button{padding:0 22px;border-radius:14px;background:var(--accent);color:#fff;font-weight:600}
+
+/* Hoja de detalle */
+.sheet-back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:grid;align-items:end;justify-items:center;padding:12px;z-index:20}
+.sheet{background:var(--surface);border-radius:20px;width:100%;max-width:496px;padding:24px 18px 18px;text-align:center;animation:up .25s cubic-bezier(.2,.8,.3,1)}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet .big{font-size:96px;line-height:1.05}
+.sheet .rom{font-size:26px;font-weight:600;color:var(--accent)}
+.sheet .meta{font-size:13px;color:var(--label-2);margin:6px 0 18px}
+.cell{transition:transform .1s}
+.cell:active{transform:scale(.92)}
+
+.hint{font-size:13px;color:var(--label-2);margin:8px 4px 0;line-height:1.45}
+.empty{text-align:center;color:var(--label-2);font-size:15px;padding:30px 20px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- INICIO -->
+<section id="s-home" class="screen active">
+  <h1 class="large kana-font">ひらがな</h1>
+  <p class="sub">Flashcards para aprender hiragana</p>
+
+  <div class="hero">
+    <div class="hero-top">
+      <span class="hero-num" id="home-mastered">0 de 46</span>
+      <span class="hero-label">caracteres dominados</span>
+    </div>
+    <div class="track"><i id="home-bar" style="width:0%"></i></div>
+  </div>
+
+  <div class="section-head">Practicar</div>
+  <div class="list">
+    <button class="row" data-start="study">
+      <span class="row-icon" style="background:#34C759">📖</span>
+      <span class="row-body"><span class="row-title">Estudio</span><span class="row-desc">Sin prisa, repite lo que fallas</span></span>
+      <span class="chev"></span>
+    </button>
+    <button class="row" data-go="s-ta-setup">
+      <span class="row-icon" style="background:#FF9500">⏱️</span>
+      <span class="row-body"><span class="row-title">Time attack</span><span class="row-desc" id="home-ta">Máximo de aciertos contrarreloj</span></span>
+      <span class="chev"></span>
+    </button>
+    <button class="row" data-go="s-sv-setup">
+      <span class="row-icon" style="background:#FF3B30">💥</span>
+      <span class="row-body"><span class="row-title">Survival</span><span class="row-desc" id="home-sv">Pocos segundos por tarjeta</span></span>
+      <span class="chev"></span>
+    </button>
+  </div>
+
+  <div class="section-head">Consultar</div>
+  <div class="list">
+    <button class="row" data-go="s-explore">
+      <span class="row-icon" style="background:#007AFF">あ</span>
+      <span class="row-body"><span class="row-title">Todos los caracteres</span><span class="row-desc">Toca uno para verlo y escucharlo</span></span>
+      <span class="chev"></span>
+    </button>
+  </div>
+
+  <div class="section-head">Tu avance</div>
+  <div class="list">
+    <button class="row" data-go="s-progress">
+      <span class="row-icon" style="background:#AF52DE">📊</span>
+      <span class="row-body"><span class="row-title">Progreso</span><span class="row-desc">Mapa de dominio y récords</span></span>
+      <span class="chev"></span>
+    </button>
+    <button class="row" data-go="s-settings">
+      <span class="row-icon" style="background:#8E8E93">⚙️</span>
+      <span class="row-body"><span class="row-title">Ajustes</span><span class="row-desc" id="home-sets">46 caracteres activos</span></span>
+      <span class="chev"></span>
+    </button>
+  </div>
+</section>
+
+<!-- ESTUDIO / JUEGO -->
+<section id="s-study" class="screen">
+  <div class="hud">
+    <button class="nav-btn" data-exit>Salir</button>
+    <div style="display:flex;gap:20px" id="study-hud"></div>
+  </div>
+  <div id="study-stage"></div>
+</section>
+
+<!-- TIME ATTACK: AJUSTES -->
+<section id="s-ta-setup" class="screen">
+  <div class="nav">
+    <button class="nav-btn" data-go="s-home"><span class="chev"></span> Inicio</button>
+    <span class="nav-title">Time attack</span><span class="nav-right"></span>
+  </div>
+  <h1 class="large">Contrarreloj</h1>
+  <p class="sub">Las tarjetas salen sin parar. Acierta todas las que puedas antes de que se acabe el tiempo.</p>
+
+  <div class="section-head">Duración de la partida</div>
+  <div class="list">
+    <div class="row no-icon">
+      <span class="row-body"><span class="row-title">Segundos</span></span>
+      <span class="stepper">
+        <button class="step-btn" data-step="ta-secs:-15">−</button>
+        <input id="ta-secs" type="number" inputmode="numeric" min="10" max="600" value="60">
+        <button class="step-btn" data-step="ta-secs:15">+</button>
+      </span>
+    </div>
+  </div>
+  <div class="hint">Cada acierto suma 100 puntos, más un bono por responder rápido y por encadenar aciertos. Cada fallo resta 20.</div>
+
+  <div class="section-head" id="ta-record-head">Tu récord</div>
+  <div class="list"><div class="row no-icon"><span class="row-body"><span class="row-title" id="ta-record">Aún sin partidas</span></span></div></div>
+
+  <div style="margin-top:24px"><button class="btn" data-start="ta">Empezar</button></div>
+</section>
+
+<!-- SURVIVAL: AJUSTES -->
+<section id="s-sv-setup" class="screen">
+  <div class="nav">
+    <button class="nav-btn" data-go="s-home"><span class="chev"></span> Inicio</button>
+    <span class="nav-title">Survival</span><span class="nav-right"></span>
+  </div>
+  <h1 class="large">Sin margen</h1>
+  <p class="sub">Una tarjeta a la vez con la barra corriendo. Si fallas o se te acaba el tiempo, pierdes puntos y sigues.</p>
+
+  <div class="section-head">Tarjetas</div>
+  <div class="seg" id="sv-count">
+    <button data-val="10">10</button><button data-val="20" aria-pressed="true">20</button><button data-val="30">30</button>
+  </div>
+
+  <div class="section-head">Tiempo por tarjeta</div>
+  <div class="list">
+    <div class="row no-icon">
+      <span class="row-body"><span class="row-title">Segundos</span></span>
+      <span class="stepper">
+        <button class="step-btn" data-step="sv-secs:-1">−</button>
+        <input id="sv-secs" type="number" inputmode="numeric" min="1" max="30" value="5">
+        <button class="step-btn" data-step="sv-secs:1">+</button>
+      </span>
+    </div>
+  </div>
+  <div class="hint">Acertar suma 100 puntos más un bono por el tiempo que te sobre. Fallar o quedarte sin tiempo resta 50.</div>
+
+  <div class="section-head">Tu récord</div>
+  <div class="list"><div class="row no-icon"><span class="row-body"><span class="row-title" id="sv-record">Aún sin partidas</span></span></div></div>
+
+  <div style="margin-top:24px"><button class="btn" data-start="sv">Empezar</button></div>
+</section>
+
+<!-- RESULTADOS -->
+<section id="s-results" class="screen">
+  <div class="nav">
+    <button class="nav-btn" data-go="s-home"><span class="chev"></span> Inicio</button>
+    <span class="nav-title" id="res-title">Resultados</span><span class="nav-right"></span>
+  </div>
+  <div class="score-wrap">
+    <div class="score-num" id="res-score">0</div>
+    <div class="score-cap" id="res-cap">puntos</div>
+    <div id="res-record-wrap"></div>
+  </div>
+  <div class="section-head">Resumen</div>
+  <div class="list" id="res-stats"></div>
+  <div id="res-review"></div>
+  <div style="margin-top:24px">
+    <button class="btn" id="res-again">Otra partida</button>
+    <button class="btn secondary" data-go="s-home">Volver al inicio</button>
+  </div>
+</section>
+
+<!-- CONSULTA -->
+<section id="s-explore" class="screen">
+  <div class="nav">
+    <button class="nav-btn" data-go="s-home"><span class="chev"></span> Inicio</button>
+    <span class="nav-title">Caracteres</span><span class="nav-right"></span>
+  </div>
+  <h1 class="large">Todos los caracteres</h1>
+  <p class="sub">Toca cualquiera para verlo en grande y oír cómo suena.</p>
+  <div id="explore-wrap"></div>
+</section>
+
+<!-- PROGRESO -->
+<section id="s-progress" class="screen">
+  <div class="nav">
+    <button class="nav-btn" data-go="s-home"><span class="chev"></span> Inicio</button>
+    <span class="nav-title">Progreso</span><span class="nav-right"></span>
+  </div>
+  <h1 class="large">Mapa de dominio</h1>
+  <p class="sub">Cada carácter sube de nivel cuando lo aciertas y vuelve al principio cuando lo fallas.</p>
+  <div id="map-wrap"></div>
+  <div class="legend">
+    <span><i style="background:var(--fill)"></i>Sin ver</span>
+    <span><i style="background:rgba(255,59,48,.18)"></i>Nuevo</span>
+    <span><i style="background:rgba(255,204,0,.28)"></i>En proceso</span>
+    <span><i style="background:rgba(52,199,89,.55)"></i>Dominado</span>
+  </div>
+  <div class="section-head">Récords</div>
+  <div class="list" id="records-list"></div>
+  <div style="margin-top:24px"><button class="btn danger" id="btn-reset">Borrar todo el progreso</button></div>
+</section>
+
+<!-- AJUSTES -->
+<section id="s-settings" class="screen">
+  <div class="nav">
+    <button class="nav-btn" data-go="s-home"><span class="chev"></span> Inicio</button>
+    <span class="nav-title">Ajustes</span><span class="nav-right"></span>
+  </div>
+  <h1 class="large">Ajustes</h1>
+  <div class="section-head">Apariencia</div>
+  <div class="seg" id="set-theme">
+    <button data-val="auto">Automático</button><button data-val="light">Claro</button><button data-val="dark">Oscuro</button>
+  </div>
+
+  <div class="section-head">Caracteres incluidos</div>
+  <div class="list" id="set-sets"></div>
+
+  <div class="section-head">Cómo se pregunta</div>
+  <div class="seg" id="set-dir">
+    <button data-val="jp">か → ka</button><button data-val="ro">ka → か</button><button data-val="mix">Mezclado</button>
+  </div>
+  <div class="hint">Reconocer el carácter es más fácil que producirlo. Empieza por か → ka y cambia cuando te salga natural.</div>
+
+  <div class="section-head">Cómo se responde</div>
+  <div class="seg" id="set-answer">
+    <button data-val="choice">Opción múltiple</button><button data-val="type">Escribir con el teclado</button>
+  </div>
+  <div class="hint">Al escribir se aceptan las dos romanizaciones habituales: shi o si, tsu o tu, ja o jya. Las preguntas de ka → か siempre se responden con opciones, porque escribir kana necesita teclado japonés.</div>
+
+  <div class="section-head">Sonido</div>
+  <div class="list">
+    <div class="row no-icon">
+      <span class="row-body"><span class="row-title">Leer el carácter en voz alta</span><span class="row-desc">Usa la voz japonesa del sistema, si la hay</span></span>
+      <button class="switch" id="set-audio" role="switch" aria-checked="false"><i></i></button>
+    </div>
+  </div>
+</section>
+
+<div id="sheet-back" class="sheet-back" hidden>
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="big kana-font" id="sheet-k"></div>
+    <div class="rom" id="sheet-r"></div>
+    <div class="meta" id="sheet-m"></div>
+    <button class="btn" id="sheet-play">Escuchar</button>
+    <button class="btn quiet" id="sheet-close">Cerrar</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ---------- Datos ---------- */
+const RAW = {
+  basic:"あ:a い:i う:u え:e お:o か:ka き:ki く:ku け:ke こ:ko さ:sa し:shi す:su せ:se そ:so た:ta ち:chi つ:tsu て:te と:to な:na に:ni ぬ:nu ね:ne の:no は:ha ひ:hi ふ:fu へ:he ほ:ho ま:ma み:mi む:mu め:me も:mo や:ya ゆ:yu よ:yo ら:ra り:ri る:ru れ:re ろ:ro わ:wa を:wo ん:n",
+  dakuten:"が:ga ぎ:gi ぐ:gu げ:ge ご:go ざ:za じ:ji ず:zu ぜ:ze ぞ:zo だ:da ぢ:ji づ:zu で:de ど:do ば:ba び:bi ぶ:bu べ:be ぼ:bo ぱ:pa ぴ:pi ぷ:pu ぺ:pe ぽ:po",
+  yoon:"きゃ:kya きゅ:kyu きょ:kyo しゃ:sha しゅ:shu しょ:sho ちゃ:cha ちゅ:chu ちょ:cho にゃ:nya にゅ:nyu にょ:nyo ひゃ:hya ひゅ:hyu ひょ:hyo みゃ:mya みゅ:myu みょ:myo りゃ:rya りゅ:ryu りょ:ryo ぎゃ:gya ぎゅ:gyu ぎょ:gyo じゃ:ja じゅ:ju じょ:jo びゃ:bya びゅ:byu びょ:byo ぴゃ:pya ぴゅ:pyu ぴょ:pyo"
+};
+const SET_INFO = {
+  basic:{name:"Básicos",desc:"あ い う… los 46 fundamentales"},
+  dakuten:{name:"Con dakuten",desc:"が ざ だ ば ぱ… 25 más"},
+  yoon:{name:"Combinados",desc:"きゃ しゅ ちょ… 33 más"}
+};
+const ALL = [];
+for (const set in RAW) RAW[set].split(" ").forEach(p=>{const [k,r]=p.split(":");ALL.push({k,r,set});});
+
+/* ---------- Estado ---------- */
+const DEF_SETTINGS = {theme:"auto", sets:{basic:true,dakuten:false,yoon:false}, dir:"jp", audio:false, answerMode:"choice"};
+
+// romanizaciones alternativas aceptadas al escribir (nihon-shiki → hepburn)
+const ALT = {si:"shi",ti:"chi",tu:"tsu",hu:"fu",zi:"ji",di:"ji",du:"zu",nn:"n",
+  sya:"sha",syu:"shu",syo:"sho",tya:"cha",tyu:"chu",tyo:"cho",
+  zya:"ja",zyu:"ju",zyo:"jo",jya:"ja",jyu:"ju",jyo:"jo",
+  dya:"ja",dyu:"ju",dyo:"jo",cya:"cha",cyu:"chu",cyo:"cho"};
+const normRomaji = s => { const v = String(s||"").trim().toLowerCase().replace(/[^a-z]/g,""); return ALT[v] || v; };
+let S = JSON.parse(JSON.stringify(DEF_SETTINGS));
+let P = {};       // progreso por carácter: {box, ok, ko}
+let R = {};       // récords por configuración
+let lastRun = null;
+
+/* ---------- Almacenamiento (artifact / archivo local / memoria) ---------- */
+const mem = {};
+const Store = {
+  async get(key){
+    try{ if(window.storage){ const r = await window.storage.get(key,false); if(r) return JSON.parse(r.value); } }catch(e){}
+    try{ const v = localStorage.getItem(key); if(v!=null) return JSON.parse(v); }catch(e){}
+    return mem[key] ?? null;
+  },
+  async set(key,val){
+    mem[key]=val;
+    try{ if(window.storage){ await window.storage.set(key, JSON.stringify(val), false); return; } }catch(e){}
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+};
+const save = () => { Store.set("hira_settings",S); Store.set("hira_progress",P); Store.set("hira_records",R); };
+
+/* ---------- Utilidades ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const rnd = n => Math.floor(Math.random()*n);
+const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; };
+const deck = () => ALL.filter(c=>S.sets[c.set]);
+const prog = k => P[k] || (P[k]={box:0,ok:0,ko:0});
+const fmtTime = ms => { const s=Math.round(ms/1000); return s<60? s+" s" : Math.floor(s/60)+" min "+String(s%60).padStart(2,"0")+" s"; };
+
+function show(id){
+  if (id!=="s-study") stopGame();
+  $$(".screen").forEach(s=>s.classList.toggle("active", s.id===id));
+  window.scrollTo(0,0);
+  if(id==="s-home") renderHome();
+  if(id==="s-explore") renderExplore();
+  if(id==="s-progress") renderProgress();
+  if(id==="s-settings") renderSettings();
+  if(id==="s-ta-setup"||id==="s-sv-setup") renderRecords();
+}
+
+function applyTheme(){
+  const dark = S.theme==="dark" || (S.theme==="auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  $('meta[name="theme-color"]').content = dark ? "#000000" : "#F2F2F7";
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ if(S.theme==="auto") applyTheme(); });
+
+let jaVoice = null;
+function loadVoice(){ try{ jaVoice = speechSynthesis.getVoices().find(v=>v.lang && v.lang.toLowerCase().startsWith("ja")) || null; }catch(e){} }
+if (window.speechSynthesis){ loadVoice(); speechSynthesis.onvoiceschanged = loadVoice; }
+function speak(text, force){
+  if((!S.audio && !force) || !window.speechSynthesis) return;
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang="ja-JP"; if(jaVoice)u.voice=jaVoice; u.rate=.85; speechSynthesis.speak(u); }catch(e){}
+}
+
+/* ---------- Preguntas ---------- */
+function pickCard(pool){
+  // ponderado: lo que menos dominas sale más seguido
+  let total=0; const w = pool.map(c=>{ const b=prog(c.k).box; const x=[5,5,4,3,2,1][Math.min(b,5)]; total+=x; return x; });
+  let t=Math.random()*total;
+  for(let i=0;i<pool.length;i++){ t-=w[i]; if(t<=0) return pool[i]; }
+  return pool[pool.length-1];
+}
+function buildQuestion(pool, prev){
+  let card = pickCard(pool);
+  if(pool.length>1 && prev && card.k===prev) card = pickCard(pool.filter(c=>c.k!==prev));
+  const dir = S.dir==="mix" ? (Math.random()<.5?"jp":"ro") : S.dir;
+  const used = new Set([card.r]);
+  const opts = [card];
+  const rest = shuffle(pool.filter(c=>c.k!==card.k));
+  for(const c of rest){ if(opts.length>=4) break; if(used.has(c.r)) continue; used.add(c.r); opts.push(c); }
+  return {card, dir, options: shuffle(opts)};
+}
+
+/* ---------- Motor de partida ---------- */
+let G = null, raf = 0;
+
+const stage = $("#study-stage"), hud = $("#study-hud");
+
+function startGame(mode, cfg){
+  const pool = deck();
+  if(pool.length < 4){ alert("Activa al menos un grupo de caracteres en Ajustes."); return; }
+  G = {mode, cfg, pool, score:0, ok:0, ko:0, streak:0, best:0, times:[], wrong:[], n:0,
+       started:performance.now(), lock:false, prev:null, cardStart:0, lostPoints:0};
+  show("s-study");
+  nextCard();
+  if(mode!=="study"){ raf = requestAnimationFrame(tick); }
+}
+function stopGame(){ if(raf) cancelAnimationFrame(raf); raf=0; G=null; }
+
+function tick(){
+  if(!G){ return; }
+  if(G.mode==="ta"){
+    const left = G.cfg.secs*1000 - (performance.now()-G.started);
+    const el = $("#hud-time");
+    if(el){ el.textContent = Math.max(0,Math.ceil(left/1000)); el.classList.toggle("warn", left<10000); }
+    if(left<=0){ return endGame(); }
+  }
+  if(G.mode==="sv"){
+    const fill = $("#tbar");
+    if(fill && !G.lock){
+      const p = 1 - (performance.now()-G.cardStart)/(G.cfg.secs*1000);
+      fill.style.transform = "scaleX("+Math.max(0,p)+")";
+      fill.classList.toggle("low", p<.3);
+      if(p<=0){ answer({timeout:true}); }
+    }
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+function renderHud(){
+  if(G.mode==="study"){
+    hud.innerHTML = `<div class="hud-stat"><div class="hud-num">${G.ok}/${G.n}</div><div class="hud-cap">aciertos</div></div>
+      <div class="hud-stat"><div class="hud-num">${G.streak}</div><div class="hud-cap">racha</div></div>`;
+  } else if(G.mode==="ta"){
+    hud.innerHTML = `<div class="hud-stat"><div class="hud-num" id="hud-time">${G.cfg.secs}</div><div class="hud-cap">segundos</div></div>
+      <div class="hud-stat"><div class="hud-num">${G.score}</div><div class="hud-cap">puntos</div></div>
+      <div class="hud-stat"><div class="hud-num">${G.streak}</div><div class="hud-cap">racha</div></div>`;
+  } else {
+    hud.innerHTML = `<div class="hud-stat"><div class="hud-num">${Math.min(G.n+1,G.cfg.count)}/${G.cfg.count}</div><div class="hud-cap">tarjeta</div></div>
+      <div class="hud-stat"><div class="hud-num">${G.score}</div><div class="hud-cap">puntos</div></div>
+      <div class="hud-stat"><div class="hud-num">${G.streak}</div><div class="hud-cap">racha</div></div>`;
+  }
+}
+
+function nextCard(){
+  if(G.mode==="sv" && G.n >= G.cfg.count) return endGame();
+  G.q = buildQuestion(G.pool, G.prev);
+  G.q.useType = S.answerMode==="type" && G.q.dir==="jp";   // escribir kana necesita teclado japonés
+  G.prev = G.q.card.k;
+  G.lock = false;
+  const {card,dir,options,useType} = G.q;
+  const front = dir==="jp" ? `<div class="kana kana-font">${card.k}</div>` : `<div class="kana roman">${card.r}</div>`;
+  const ask = dir==="jp" ? "¿Cómo se lee?" : "¿Qué carácter es?";
+  const cardHTML = `<div class="ask">${ask}</div>${front}`;
+
+  // si ya hay un campo de escritura en pantalla, se reutiliza para no cerrar el teclado del móvil
+  const reuse = useType && stage.querySelector("#ans") && stage.querySelector("#card");
+  if(reuse){
+    const c = $("#card"); c.className = "card"; c.innerHTML = cardHTML;
+    const i = $("#ans"); i.value = ""; i.className = ""; i.readOnly = false; i.focus();
+  } else {
+    stage.innerHTML =
+      (G.mode==="sv" ? `<div class="timerbar"><i id="tbar"></i></div>` : `<div style="height:6px;margin-bottom:20px"></div>`) +
+      `<div class="card" id="card">${cardHTML}</div>` +
+      (useType
+        ? `<div class="answer-form"><input id="ans" type="text" inputmode="latin" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="escribe la lectura"><button id="ans-go">OK</button></div>`
+        : `<div class="options">` + options.map((o,i)=>
+            `<button class="opt ${dir==="jp"?"":"kana-font"}" data-i="${i}"><span class="num">${i+1}</span>${dir==="jp"?o.r:o.k}</button>`).join("") + `</div>`);
+    if(useType){
+      const i = $("#ans");
+      i.addEventListener("keydown", e=>{ if(e.key==="Enter") submitTyped(); });
+      $("#ans-go").addEventListener("click", submitTyped);
+      i.focus();
+    } else {
+      stage.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>answer({idx:+b.dataset.i})));
+    }
+  }
+  G.cardStart = performance.now();
+  renderHud();
+}
+
+function submitTyped(){
+  if(!G || G.lock) return;
+  const v = $("#ans").value.trim();
+  if(v) answer({typed:v});
+}
+
+function answer(a){
+  if(!G || G.lock) return;
+  G.lock = true;
+  a = a || {};
+  const {card, options, useType} = G.q;
+  const elapsed = performance.now() - G.cardStart;
+  const idx = a.idx==null ? null : a.idx;
+  const right = a.typed != null ? normRomaji(a.typed) === normRomaji(card.r)
+              : idx != null ? options[idx].k === card.k : false;
+  const p = prog(card.k);
+  G.n++;
+
+  if(right){
+    G.ok++; G.streak++; G.best=Math.max(G.best,G.streak); G.times.push(elapsed);
+    p.ok++; p.box = Math.min(5, p.box+1);
+    if(G.mode==="ta") G.score += 100 + Math.max(0,Math.round(50*(1-elapsed/3000))) + Math.min(G.streak,10)*10;
+    if(G.mode==="sv") G.score += 100 + Math.round(50*Math.max(0,1-elapsed/(G.cfg.secs*1000)));
+  } else {
+    G.ko++; G.streak=0;
+    p.ko++; p.box = G.mode==="study" ? 0 : Math.max(0,p.box-1);
+    if(!G.wrong.includes(card.k)) G.wrong.push(card.k);
+    const pen = G.mode==="ta" ? 20 : G.mode==="sv" ? 50 : 0;
+    G.lostPoints += pen; G.score = Math.max(0, G.score - pen);
+  }
+
+  const cardEl = $("#card");
+  cardEl.classList.add(right?"good":"bad");
+  cardEl.insertAdjacentHTML("beforeend", `<div class="reveal">${card.k} = ${card.r}${a.timeout?" · se acabó el tiempo":""}</div>`);
+  if(useType){
+    const i = $("#ans");
+    if(i){ i.readOnly = true; i.value = a.typed || ""; i.classList.add(right?"correct":"wrong"); }
+  } else {
+    stage.querySelectorAll(".opt").forEach((b,i)=>{
+      b.disabled = true;
+      if(options[i].k===card.k) b.classList.add("correct");
+      else if(i===idx) b.classList.add("wrong");
+    });
+  }
+  speak(card.k);
+  renderHud();
+  save();
+
+  const wait = right ? 500 : (a.timeout ? 950 : 900);
+  setTimeout(()=>{ if(!G) return; if(G.mode==="sv" && G.n>=G.cfg.count) endGame(); else nextCard(); }, wait);
+}
+
+function endGame(){
+  if(!G) return;
+  const g = G; stopGame();
+  g.duration = performance.now() - g.started;
+  const key = g.mode==="ta" ? `ta_${g.cfg.secs}` : g.mode==="sv" ? `sv_${g.cfg.count}_${g.cfg.secs}` : null;
+  g.newRecord = false;
+  if(key){ const prev = R[key]||0; if(g.score>prev){ R[key]=g.score; g.newRecord = prev>0; } }
+  lastRun = g;
+  save();
+  renderResults(g);
+  show("s-results");
+}
+
+/* ---------- Resultados ---------- */
+function renderResults(g){
+  const names = {study:"Estudio", ta:"Time attack", sv:"Survival"};
+  $("#res-title").textContent = names[g.mode];
+  const acc = g.n ? Math.round(g.ok/g.n*100) : 0;
+  const avg = g.times.length ? (g.times.reduce((a,b)=>a+b,0)/g.times.length/1000).toFixed(1)+" s" : "—";
+
+  if(g.mode==="study"){ $("#res-score").textContent = acc+"%"; $("#res-cap").textContent="de aciertos en la sesión"; }
+  else { $("#res-score").textContent = g.score; $("#res-cap").textContent="puntos"; }
+
+  $("#res-record-wrap").innerHTML = g.newRecord ? `<div class="record">Nuevo récord</div>` : "";
+
+  const rows = [
+    ["Tarjetas respondidas", g.n],
+    ["Aciertos", g.ok],
+    ["Fallos", g.ko],
+    ["Precisión", acc+"%"],
+    ["Mejor racha", g.best],
+    ["Tiempo medio por acierto", avg],
+    ["Duración", fmtTime(g.duration)]
+  ];
+  if(g.mode!=="study") rows.push(["Puntos perdidos por fallos", "−"+g.lostPoints]);
+  $("#res-stats").innerHTML = rows.map(([a,b])=>
+    `<div class="row no-icon"><span class="row-body"><span class="row-title">${a}</span></span><span class="row-value">${b}</span></div>`).join("");
+
+  $("#res-review").innerHTML = g.wrong.length
+    ? `<div class="section-head">Para repasar</div><div class="chips">` +
+      g.wrong.map(k=>{const c=ALL.find(x=>x.k===k); return `<span class="chip"><b class="kana-font">${c.k}</b>${c.r}</span>`;}).join("") + `</div>`
+    : (g.n ? `<div class="section-head">Para repasar</div><div class="chips"><span style="color:var(--label-2);font-size:15px">Ni un fallo. Sube el nivel en Ajustes.</span></div>` : "");
+
+  $("#res-again").onclick = ()=> startGame(g.mode, g.cfg);
+}
+
+/* ---------- Pantallas ---------- */
+function renderHome(){
+  const d = deck();
+  const mastered = d.filter(c=>prog(c.k).box>=4).length;
+  $("#home-mastered").textContent = `${mastered} de ${d.length}`;
+  $("#home-bar").style.width = (d.length? mastered/d.length*100:0)+"%";
+  $("#home-sets").textContent = `${d.length} caracteres activos`;
+  const ta = R[`ta_${cfgTA().secs}`], sv = R[`sv_${cfgSV().count}_${cfgSV().secs}`];
+  $("#home-ta").textContent = ta ? `Récord: ${ta} puntos en ${cfgTA().secs} s` : "Máximo de aciertos contrarreloj";
+  $("#home-sv").textContent = sv ? `Récord: ${sv} puntos` : "Pocos segundos por tarjeta";
+}
+
+function renderExplore(){
+  $("#explore-wrap").innerHTML = Object.keys(SET_INFO).map(set=>{
+    const cells = ALL.filter(c=>c.set===set).map(c=>
+      `<button class="cell" data-kana="${c.k}"><span class="kana-font">${c.k}</span><small>${c.r}</small></button>`).join("");
+    return `<div class="section-head" style="margin-top:18px">${SET_INFO[set].name}</div><div class="map">${cells}</div>`;
+  }).join("");
+  $$("#explore-wrap .cell").forEach(b=>b.addEventListener("click",()=>openSheet(b.dataset.kana)));
+}
+
+function openSheet(k){
+  const c = ALL.find(x=>x.k===k); if(!c) return;
+  const p = P[k];
+  const seen = p ? p.ok+p.ko : 0;
+  $("#sheet-k").textContent = c.k;
+  $("#sheet-r").textContent = c.r;
+  $("#sheet-m").textContent = seen
+    ? `Nivel ${p.box} de 5 · ${p.ok} aciertos y ${p.ko} fallos`
+    : "Todavía no lo has practicado";
+  $("#sheet-play").onclick = ()=> speak(c.k, true);
+  $("#sheet-back").hidden = false;
+  speak(c.k, true);
+}
+const closeSheet = ()=> $("#sheet-back").hidden = true;
+$("#sheet-close").addEventListener("click", closeSheet);
+$("#sheet-back").addEventListener("click", e=>{ if(e.target.id==="sheet-back") closeSheet(); });
+
+function renderProgress(){
+  const wrap = $("#map-wrap");
+  const active = Object.keys(S.sets).filter(s=>S.sets[s]);
+  if(!active.length){ wrap.innerHTML = `<div class="empty">No hay grupos activos. Actívalos en Ajustes.</div>`; }
+  else wrap.innerHTML = active.map(set=>{
+    const cells = ALL.filter(c=>c.set===set).map(c=>{
+      const b = prog(c.k).box;
+      return `<div class="cell m${b}" title="${c.k} = ${c.r}"><span class="kana-font">${c.k}</span><small>${c.r}</small></div>`;
+    }).join("");
+    return `<div class="section-head" style="margin-top:18px">${SET_INFO[set].name}</div><div class="map">${cells}</div>`;
+  }).join("");
+
+  const keys = Object.keys(R);
+  $("#records-list").innerHTML = keys.length ? keys.sort().map(k=>{
+    const p = k.split("_");
+    const label = p[0]==="ta" ? `Time attack · ${p[1]} s` : `Survival · ${p[1]} tarjetas · ${p[2]} s`;
+    return `<div class="row no-icon"><span class="row-body"><span class="row-title">${label}</span></span><span class="row-value">${R[k]} pts</span></div>`;
+  }).join("") : `<div class="row no-icon"><span class="row-body"><span class="row-title" style="color:var(--label-2)">Todavía no hay récords</span></span></div>`;
+}
+
+function renderSettings(){
+  $$("#set-theme button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.val===S.theme));
+  $$("#set-dir button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.val===S.dir));
+  $$("#set-answer button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.val===S.answerMode));
+  $("#set-audio").setAttribute("aria-checked", S.audio);
+  $("#set-sets").innerHTML = Object.keys(SET_INFO).map(k=>{
+    const n = ALL.filter(c=>c.set===k).length;
+    return `<div class="row no-icon"><span class="row-body"><span class="row-title">${SET_INFO[k].name} · ${n}</span>
+      <span class="row-desc kana-font">${SET_INFO[k].desc}</span></span>
+      <button class="switch" role="switch" data-set="${k}" aria-checked="${!!S.sets[k]}"><i></i></button></div>`;
+  }).join("");
+  $$("#set-sets .switch").forEach(sw=>sw.addEventListener("click",()=>{
+    const k = sw.dataset.set;
+    const on = !S.sets[k];
+    if(!on && Object.values({...S.sets,[k]:false}).every(v=>!v)) return; // deja al menos uno
+    S.sets[k] = on; sw.setAttribute("aria-checked", on); save();
+  }));
+}
+
+function renderRecords(){
+  const ta = R[`ta_${cfgTA().secs}`], sv = R[`sv_${cfgSV().count}_${cfgSV().secs}`];
+  $("#ta-record").textContent = ta ? `${ta} puntos en ${cfgTA().secs} s` : "Aún sin partidas con esta duración";
+  $("#sv-record").textContent = sv ? `${sv} puntos` : "Aún sin partidas con estos ajustes";
+}
+
+/* ---------- Configuración de minijuegos ---------- */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function cfgTA(){ const v = clamp(parseInt($("#ta-secs").value)||60,10,600); return {secs:v}; }
+function cfgSV(){
+  const c = +($("#sv-count button[aria-pressed=true]")?.dataset.val || 20);
+  const s = clamp(parseInt($("#sv-secs").value)||5,1,30);
+  return {count:c, secs:s};
+}
+
+/* ---------- Eventos ---------- */
+document.addEventListener("click", e=>{
+  const go = e.target.closest("[data-go]"); if(go) return show(go.dataset.go);
+  const ex = e.target.closest("[data-exit]"); if(ex) return G && G.n ? endGame() : show("s-home");
+  const st = e.target.closest("[data-start]");
+  if(st){ const m = st.dataset.start; return startGame(m, m==="ta"?cfgTA(): m==="sv"?cfgSV(): {}); }
+  const sp = e.target.closest("[data-step]");
+  if(sp){ const [id,d]=sp.dataset.step.split(":"); const i=$("#"+id);
+    i.value = clamp((parseInt(i.value)||0)+(+d), +i.min, +i.max); renderRecords(); return; }
+  const seg = e.target.closest(".seg button");
+  if(seg){ [...seg.parentNode.children].forEach(b=>b.setAttribute("aria-pressed", b===seg));
+    if(seg.parentNode.id==="set-theme"){ S.theme=seg.dataset.val; applyTheme(); save(); }
+    if(seg.parentNode.id==="set-dir"){ S.dir=seg.dataset.val; save(); }
+    if(seg.parentNode.id==="set-answer"){ S.answerMode=seg.dataset.val; save(); }
+    if(seg.parentNode.id==="sv-count") renderRecords();
+  }
+});
+$("#set-audio").addEventListener("click", ()=>{ S.audio=!S.audio; $("#set-audio").setAttribute("aria-checked",S.audio); if(S.audio) speak("こんにちは"); save(); });
+$("#ta-secs").addEventListener("change", renderRecords);
+$("#sv-secs").addEventListener("change", renderRecords);
+$("#btn-reset").addEventListener("click", ()=>{ if(confirm("Se borrarán el mapa de dominio y los récords. ¿Seguir?")){ P={}; R={}; save(); renderProgress(); } });
+
+document.addEventListener("keydown", e=>{
+  if(!$("#sheet-back").hidden){ if(e.key==="Escape") closeSheet(); return; }
+  if($("#s-study").classList.contains("active") && G){
+    if(e.key>="1" && e.key<="4"){ const b=stage.querySelector(`.opt[data-i="${+e.key-1}"]`); if(b && !b.disabled) b.click(); }
+    if(e.key==="Escape"){ G.n ? endGame() : show("s-home"); }
+  } else if(e.key==="Escape"){ show("s-home"); }
+});
+
+/* ---------- Arranque ---------- */
+(async function init(){
+  const [s,p,r] = await Promise.all([Store.get("hira_settings"),Store.get("hira_progress"),Store.get("hira_records")]);
+  if(s) S = Object.assign(JSON.parse(JSON.stringify(DEF_SETTINGS)), s, {sets:Object.assign({},DEF_SETTINGS.sets,s.sets||{})});
+  if(p) P = p;
+  if(r) R = r;
+  applyTheme();
+  renderHome();
+})();
+</script>
+</body>
+</html>
