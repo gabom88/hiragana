@@ -12,6 +12,7 @@ Puedes probarlo online aquí 👉 https://gabom88.github.io/hiragana/
 ![Sin dependencias](https://img.shields.io/badge/dependencias-ninguna-brightgreen)
 ![Offline](https://img.shields.io/badge/offline-sí-blue)
 ![Caracteres](https://img.shields.io/badge/kana-208-blueviolet)
+![Contenido](https://img.shields.io/badge/palabras%20y%20frases-396-yellow)
 
 
 ## ✨ Características
@@ -33,6 +34,13 @@ Modo de práctica sin límite de tiempo.
 * Contador de aciertos y racha.
 
 El sistema selecciona con mayor frecuencia los caracteres que tienen un menor nivel de dominio, ayudando a reforzar los que más cuestan.
+
+**No hay avance automático.** Tras responder, la tarjeta se queda en pantalla el tiempo que haga falta para mirar el error, y aparecen dos botones:
+
+* **Practicar este carácter** abre la ficha completa del carácter, con su cuadrícula, su orden de trazos y el lienzo para dibujarlo, sin salir de la partida.
+* **Siguiente** continúa. Con teclado, `Enter` o la barra espaciadora hacen lo mismo.
+
+Time Attack y Survival sí avanzan solos, porque ahí el reloj está corriendo.
 
 ### ⏱️ Time Attack
 
@@ -57,6 +65,12 @@ Modo de supervivencia en el que cada tarjeta tiene un tiempo limitado.
 * Bonificación según el tiempo restante.
 * **−50 puntos** por fallo o por quedarse sin tiempo.
 * Registro de récords según la configuración utilizada.
+
+### 🔁 Para repasar
+
+Los caracteres fallados no se pierden al terminar la partida. La pantalla de inicio muestra los **10 más recientes**, del último fallo hacia atrás y sin repetidos.
+
+Tanto ahí como en el resumen final de cualquier modo, cada carácter es pulsable y abre su ficha para practicarlo en el momento.
 
 ### 🎯 Distractores por parecido visual
 
@@ -137,7 +151,7 @@ Lectura en voz alta mediante la API de síntesis de voz del navegador, con vario
 * **Tabla de excepciones**: los motores de voz leen `は`, `へ` y `を` como partículas gramaticales (*wa*, *e*, *o*), lo cual es incorrecto al enseñar la lectura del carácter. La app los sustituye internamente por su katakana equivalente (`ハ`, `ヘ`, `ヲ`). La sustitución solo actúa cuando el texto es exactamente ese carácter suelto, así que dentro de una frase `これは なんですか` se sigue leyendo *kore wa*, que es lo correcto.
 * Botón de prueba en Ajustes.
 
-También permite escuchar individualmente cualquier carácter, palabra u oración.
+También permite escuchar individualmente cualquier carácter, palabra, oración o entrada del diccionario propio.
 
 Depende de las voces instaladas en el sistema operativo. En equipos sin voz japonesa disponible, la aplicación lo indica en lugar de fallar en silencio.
 
@@ -153,15 +167,17 @@ Al seleccionar uno se abre su ficha, que muestra:
 
 La ficha ofrece tres vistas:
 
-| Vista               | Qué muestra                                              |
-| ------------------- | -------------------------------------------------------- |
-| **Trazos**          | El glifo con el orden de trazos numerado                 |
-| **Impreso**         | La forma impresa habitual                                |
-| **Dibujar**         | Lienzo táctil para trazar sobre el glifo atenuado        |
+| Vista       | Qué muestra                                       |
+| ----------- | ------------------------------------------------- |
+| **Trazos**  | El glifo con el orden de trazos numerado          |
+| **Impreso** | La forma impresa habitual                         |
+| **Dibujar** | Lienzo táctil para trazar sobre el glifo atenuado |
 
 Los números de trazo aparecen únicamente en esta ficha. Las flashcards usan siempre la tipografía japonesa del sistema, sin numeración, para no dar pistas visuales durante la práctica.
 
 Los **caracteres combinados** (きゃ, シュ, ちょ…) se muestran en grande sin cuadrícula: son dos bloques y su orden de trazos es el de sus componentes por separado, no el de una unidad.
+
+Esta misma ficha se abre desde el modo Estudio, desde el resumen de la partida y desde la lista de repaso del inicio.
 
 ### ✏️ Modo dibujar
 
@@ -169,42 +185,73 @@ Lienzo sobre la cuadrícula para practicar el trazo con el dedo o un stylus.
 
 * Funciona con dedo, ratón y stylus mediante *pointer events*.
 * El glifo con el orden de trazos queda debajo, atenuado, para calcar encima.
-* Suavizado con curvas cuadráticas; en móvil se recogen las posiciones intermedias que el navegador agrupa, para que la línea no salga a tramos.
+* En móvil se recogen las posiciones intermedias que el navegador agrupa, para que la línea no salga a tramos.
 * Botones **Deshacer** y **Borrar**.
 * Los trazos se guardan en coordenadas normalizadas, así que girar el dispositivo no los deforma.
+
+**Paleta de 8 colores** configurable desde Ajustes. El primero es tinta que sigue el tema: negra en modo claro, blanca en oscuro.
+
+**Trazos estilizados**, activables desde Ajustes, hacen dos cosas:
+
+* Dibujan con curvas **Catmull-Rom** convertidas a Bézier cúbicas, que pasan por cada punto llegando con la tangente del vecino, sin esquinas.
+* Al levantar el dedo, simplifican el trazo con **Ramer-Douglas-Peucker**, que descarta las muestras casi colineales responsables de los micro-bultos del dedo. La limpieza va al soltar y no durante el trazo, para que la línea no baile mientras dibujas.
 
 No hay reconocimiento automático de escritura: evaluar si el trazo es correcto necesitaría un modelo que no cabe en un archivo autónomo. La autoevaluación es visual.
 
 ### 💬 Palabras
 
-Vocabulario escribible solo con kana, agrupado en **9 categorías y 90 palabras**:
+Vocabulario escribible solo con kana, agrupado en **19 categorías y 232 palabras**:
 
-Saludos y cortesía · Números del 1 al 10 · Días y tiempo · Colores · Comida y bebida · Animales · Familia y personas · Cosas del día a día · Préstamos en katakana
+Palabras esenciales · Saludos y cortesía · Números · Días y tiempo · Colores · Comida y bebida · En el konbini · En la estación · En el hotel · Lugares · Verbos básicos · Adjetivos útiles · Direcciones · El cuerpo y la salud · El clima · Animales · Familia y personas · Cosas del día a día · Préstamos en katakana
 
 Cada entrada muestra el kana, la romanización y el significado en español, y se puede escuchar.
 
 ### 🗨️ Oraciones
 
-Frases de uso diario agrupadas por situación: **8 categorías y 70 oraciones**.
+Frases de uso diario agrupadas por situación: **15 categorías y 164 oraciones**.
 
-Saludos y despedidas · Presentarse · Cortesía y disculpas · Preguntas básicas · En un restaurante o tienda · Cuando no entiendes · Moverse por la ciudad · Frases del día a día
+Saludos y despedidas · Presentarse · Cortesía y disculpas · Preguntas básicas · Cuando no entiendes · En el konbini · En un restaurante · Alergias y comida especial · En el tren y el metro · En el aeropuerto · En el hotel · De compras · Preguntar el camino · Emergencias y salud · Frases del día a día
+
+Las categorías de viaje incluyen también **lo que te van a decir a ti**, no solo lo que dices tú. En el konbini aparecen las preguntas de caja (`ふくろは ごりようですか`, `あたためますか`, `おはしは おつけしますか`) junto a las respuestas útiles, empezando por `だいじょうぶです`, que funciona como un «no, gracias».
 
 Se eligieron frases que en el uso real se escriben en kana (ありがとうございます, ただいま, がんばって), evitando aquellas que normalmente llevan kanji, para no acostumbrar la vista a una forma que luego no se encuentra.
 
 Las oraciones llevan **espacios entre palabras**. El japonés escrito no los usa, pero sin kanji una frase corrida resulta ilegible para quien empieza; es la misma convención que emplean los materiales de nivel inicial, y la propia pantalla lo advierte.
 
+### 📓 Diccionario propio
+
+Además del contenido incluido, puedes añadir tus propias palabras. Se pegan en bloque, una por línea:
+
+```text
+おはよう, ohayou, Buenos días
+ねこ, Gato
+がっこう, gakkou, Escuela
+```
+
+**La pronunciación es opcional.** Si la omites y el japonés está escrito solo en kana, se calcula sola y aparece marcada como `auto`. La transliteración es determinista y cubre `っ` (duplica la consonante siguiente), `ん` ante vocal (`hon'ya`), el alargador `ー` y los combinados.
+
+Con kanji la app pide la pronunciación en lugar de inventarla: leer 今日 requiere un analizador morfológico con diccionario, de varios megabytes, y aun así la lectura es ambigua según el contexto.
+
+Cuando una línea trae tres campos, el del medio solo se toma como pronunciación si de verdad lo parece: se compara con el romaji que la app puede generar. Así `ねこ, Gato, minino` no confunde «Gato» con una lectura, y la traducción puede llevar comas sin romperse.
+
+Cada entrada se escucha y se elimina individualmente, y el diccionario completo se puede vaciar de una vez.
+
 ### 💾 Copia de seguridad
 
-El avance vive en el navegador, así que borrar los datos del sitio lo elimina. La app incluye una pantalla propia para exportarlo e importarlo.
+El avance vive en el navegador, así que borrar los datos del sitio lo elimina. La app incluye una pantalla propia para exportarlo e importarlo, accesible desde el inicio y desde **Ajustes**.
 
 **Exportar**: copia al portapapeles o descarga un `.json` con la fecha en el nombre. Si la API del portapapeles no está disponible (habitual al abrir el archivo con `file://`), recurre a la selección manual del texto.
 
 **Importar**: pegando el contenido o eligiendo un archivo, con dos modos.
 
-| Modo             | Comportamiento                                                                                            |
-| ---------------- | --------------------------------------------------------------------------------------------------------- |
-| **Combinar**     | Conserva, carácter por carácter, la versión con más práctica acumulada; se queda con el mejor récord de cada modo y con la unión de los días practicados |
-| **Reemplazar**   | Descarta el avance actual y deja el de la copia                                                            |
+| Modo           | Comportamiento                                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Combinar**   | Conserva, carácter por carácter, la versión con más práctica acumulada; se queda con el mejor récord de cada modo y con la unión de los días practicados |
+| **Reemplazar** | Descarta el avance actual y deja el de la copia                                                                                                          |
+
+La copia completa incluye configuración, progreso, récords, días practicados, caracteres pendientes de repaso y el diccionario propio.
+
+El **diccionario también se exporta e importa por separado**, por si quieres compartir solo tu lista de palabras. Al importarlo se añaden las que falten y se respetan las que ya tengas con el mismo japonés.
 
 La importación valida el archivo y descarta claves que no correspondan a kana conocidos, además de sanear los valores fuera de rango.
 
@@ -244,10 +291,14 @@ La aplicación guarda automáticamente:
 * Progreso de cada carácter.
 * Récords.
 * Días practicados.
+* Caracteres pendientes de repaso.
+* Diccionario propio.
 
 Utiliza el almacenamiento disponible del navegador, con `localStorage` como alternativa, por lo que **no necesita una base de datos ni un servidor**.
 
 No hay cuentas ni analítica, y no se realiza ninguna petición de red.
+
+Borrar el progreso desde Ajustes no toca el diccionario propio.
 
 ## 🚀 Uso
 
@@ -274,7 +325,9 @@ El proyecto está construido utilizando únicamente tecnologías web estándar:
 
 No utiliza frameworks ni librerías externas.
 
-La fuente de orden de trazos va **subseteada e incrustada en base64** dentro del CSS: 177 glifos —hiragana y katakana completos, incluidos los pequeños y el alargador `ー`— en formato WOFF, unos 58 KB antes de codificar. Por eso la aplicación funciona sin conexión y sigue siendo un único archivo, de aproximadamente 156 KB en total.
+La fuente de orden de trazos va **subseteada e incrustada en base64** dentro del CSS: 177 glifos —hiragana y katakana completos, incluidos los pequeños y el alargador `ー`— en formato WOFF, unos 58 KB antes de codificar. Por eso la aplicación funciona sin conexión y sigue siendo un único archivo, de aproximadamente 188 KB en total.
+
+Toda la romanización del contenido incluido está **generada con el mismo conversor que usa el diccionario**, en lugar de escrita a mano, de modo que las 396 entradas son consistentes con lo que la app calcularía y no puede haber erratas de tecleo.
 
 ## 📱 Diseño
 
@@ -296,15 +349,13 @@ La aplicación limita el contenido principal a un ancho de aproximadamente 520 p
 
 Durante las preguntas de opción múltiple:
 
-| Tecla | Acción               |
-| ----- | -------------------- |
-| `1`   | Seleccionar opción 1 |
-| `2`   | Seleccionar opción 2 |
-| `3`   | Seleccionar opción 3 |
-| `4`   | Seleccionar opción 4 |
-| `Esc` | Salir de la partida  |
+| Tecla             | Acción                            |
+| ----------------- | --------------------------------- |
+| `1` … `4`         | Seleccionar la opción             |
+| `Enter` / `Espacio` | Continuar tras responder, en Estudio |
+| `Esc`             | Salir de la partida               |
 
-En respuestas escritas, `Enter` permite enviar la respuesta.
+En respuestas escritas, `Enter` envía la respuesta y, una vez corregida, pasa a la siguiente. Con la ficha de un carácter abierta, `Esc` la cierra.
 
 ## 📈 Estadísticas
 
@@ -318,7 +369,7 @@ Al finalizar una sesión se muestra un resumen con:
 * Tiempo medio por acierto.
 * Duración de la sesión.
 * Puntos perdidos por errores.
-* Caracteres que necesitan repaso.
+* Caracteres que necesitan repaso, pulsables para practicarlos.
 
 ## 🌐 Compatibilidad
 
