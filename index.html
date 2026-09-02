@@ -125,6 +125,7 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
 .btn.quiet{background:none;color:var(--accent);font-weight:400}
 .btn.danger{background:var(--fill);color:var(--red)}
 .btn + .btn{margin-top:10px}
+.after{margin-top:18px}
 
 /* HUD de juego */
 .hud{display:flex;align-items:center;justify-content:space-between;height:52px;margin-top:4px;gap:12px}
@@ -162,7 +163,8 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
 .score-cap{font-size:15px;color:var(--label-2);margin-top:2px}
 .record{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;color:var(--orange);background:rgba(255,149,0,.14);padding:5px 12px;border-radius:20px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;background:var(--surface);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
-.chip{display:flex;align-items:center;gap:6px;background:var(--fill);border-radius:9px;padding:6px 10px;font-size:15px}
+.chip{display:flex;align-items:center;gap:6px;background:var(--fill);border-radius:9px;padding:6px 10px;font-size:15px;font-family:inherit;color:inherit;border:0;cursor:pointer;transition:transform .1s}
+.chip:active{background:var(--fill-2);transform:scale(.94)}
 .chip b{font-size:20px;font-weight:400}
 
 /* Mapa de dominio */
@@ -230,6 +232,12 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
 .w-kana.long{font-size:18px;line-height:1.45}
 .w-rom{font-size:13px;color:var(--label-2)}
 .spk{width:34px;height:34px;border-radius:50%;background:var(--fill);display:grid;place-items:center;font-size:15px;flex:none}
+.del{width:34px;height:34px;border-radius:50%;background:var(--fill);display:grid;place-items:center;font-size:17px;color:var(--red);flex:none;margin-left:8px}
+.del:active{background:var(--fill-2)}
+.auto{font-size:11px;background:var(--fill-2);color:var(--label-2);border-radius:5px;padding:1px 5px;margin-left:6px}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;background:var(--surface);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(128,128,128,.3);transition:transform .12s}
+.sw[aria-pressed="true"]{border-color:var(--label);transform:scale(1.1)}
 .spk:active{background:var(--fill-2)}
 
 /* Copia de seguridad */
@@ -258,6 +266,8 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
     <div class="track"><i id="home-bar" style="width:0%"></i></div>
     <div id="home-streak" style="margin-top:12px;font-size:14px;color:var(--label-2)"></div>
   </div>
+
+  <div id="home-review"></div>
 
   <div class="section-head">Practicar</div>
   <div class="list">
@@ -293,6 +303,11 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
     <button class="row" data-go="s-phrases">
       <span class="row-icon" style="background:#FF2D55">🗨️</span>
       <span class="row-body"><span class="row-title">Oraciones</span><span class="row-desc">Frases de uso diario por situación</span></span>
+      <span class="chev"></span>
+    </button>
+    <button class="row" data-go="s-dict">
+      <span class="row-icon" style="background:#A2845E">📓</span>
+      <span class="row-body"><span class="row-title">Diccionario</span><span class="row-desc" id="home-dict">Tus propias palabras</span></span>
       <span class="chev"></span>
     </button>
   </div>
@@ -446,6 +461,13 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
   </div>
   <div class="section-head">Récords</div>
   <div class="list" id="records-list"></div>
+  <div class="section-head">Datos</div>
+  <div class="list">
+    <button class="row no-icon" data-go="s-backup">
+      <span class="row-body"><span class="row-title">Copia de seguridad</span><span class="row-desc">Exporta o importa tu avance y tu diccionario</span></span>
+      <span class="chev"></span>
+    </button>
+  </div>
   <div style="margin-top:24px"><button class="btn danger" id="btn-reset">Borrar todo el progreso</button></div>
 </section>
 
@@ -498,6 +520,16 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
     </div>
   </div>
   <div class="hint">Así se verá la cuadrícula al abrir un carácter en Todos los caracteres.</div>
+
+  <div class="section-head">Color del trazo</div>
+  <div class="swatches" id="set-ink"></div>
+
+  <div class="list" style="margin-top:14px">
+    <div class="row no-icon">
+      <span class="row-body"><span class="row-title">Trazos estilizados</span><span class="row-desc">Redondea las curvas y limpia el temblor del dedo al levantarlo</span></span>
+      <button class="switch" id="set-smooth" role="switch" aria-checked="true"><i></i></button>
+    </div>
+  </div>
 
   <div class="section-head">Sonido</div>
   <div class="list">
@@ -554,6 +586,31 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
   <div class="list" id="wl-list"></div>
 </section>
 
+<!-- DICCIONARIO -->
+<section id="s-dict" class="screen">
+  <div class="nav">
+    <button class="nav-btn" data-go="s-home"><span class="chev"></span> Inicio</button>
+    <span class="nav-title">Diccionario</span><span class="nav-right"></span>
+  </div>
+  <h1 class="large">Diccionario</h1>
+  <p class="sub">Tus propias palabras, guardadas en este navegador.</p>
+
+  <div class="section-head">Añadir</div>
+  <textarea class="ta" id="dic-in" placeholder="おはよう, ohayou, Buenos días&#10;ねこ, Gato&#10;がっこう, gakkou, Escuela"></textarea>
+  <div style="display:flex;gap:10px;margin-top:10px">
+    <button class="btn" id="dic-add" style="margin:0">Añadir palabras</button>
+    <button class="btn secondary" id="dic-clear-in" style="margin:0">Limpiar</button>
+  </div>
+  <div class="note" id="dic-note"></div>
+  <div class="hint">Una palabra por línea, separada por comas: <b>japonés, pronunciación, traducción</b>. La pronunciación es opcional: si la omites y el japonés está escrito solo en kana, se calcula sola y aparece marcada como <span class="auto">auto</span>. Con kanji tienes que escribirla, porque leerlo requiere un diccionario morfológico que no cabe en un archivo offline.</div>
+
+  <div class="section-head">Tus palabras <span id="dic-count" style="color:var(--label-2);font-weight:400"></span></div>
+  <div class="list" id="dic-list"></div>
+  <div id="dic-tools" style="margin-top:14px" hidden>
+    <button class="btn danger" id="dic-wipe">Vaciar el diccionario</button>
+  </div>
+</section>
+
 <!-- COPIA DE SEGURIDAD -->
 <section id="s-backup" class="screen">
   <div class="nav">
@@ -580,6 +637,21 @@ h1.large{font-size:34px;font-weight:700;letter-spacing:-.5px;margin:12px 0 2px}
   </div>
   <div class="note" id="bk-note-in"></div>
   <div class="hint">Combinar conserva, carácter por carácter, la versión con más práctica acumulada, y se queda con el mejor récord de cada modo. Reemplazar descarta lo que hay ahora.</div>
+
+  <div class="section-head">Solo el diccionario</div>
+  <p class="sub" style="margin-bottom:12px">Las palabras que has añadido tú, por separado del avance.</p>
+  <textarea class="ta" id="dic-out" readonly></textarea>
+  <div style="display:flex;gap:10px;margin-top:10px">
+    <button class="btn secondary" id="dic-copy" style="margin:0">Copiar</button>
+    <button class="btn secondary" id="dic-down" style="margin:0">Descargar</button>
+  </div>
+  <textarea class="ta" id="dic-imp" placeholder="Pega aquí un diccionario exportado" style="margin-top:14px"></textarea>
+  <div style="margin-top:10px">
+    <label class="btn secondary" style="cursor:pointer">Elegir archivo…<input type="file" id="dic-file" accept=".json,application/json" hidden></label>
+    <button class="btn" id="dic-merge">Añadir a mi diccionario</button>
+  </div>
+  <div class="note" id="dic-note-bk"></div>
+  <div class="hint">Al importar se añaden las palabras que falten; las que ya tengas con el mismo japonés se dejan como están. El diccionario también viaja dentro de la copia completa de arriba.</div>
 </section>
 
 <div id="sheet-back" class="sheet-back" hidden>
@@ -635,28 +707,114 @@ const scriptOf = set => SET_INFO[set].script;
 
 /* Vocabulario escribible solo en kana: cada entrada es kana|romaji|significado */
 const WORDS = {
-  greet:{name:"Saludos y cortesía", icon:"👋", color:"#34C759", items:"おはよう|ohayou|Buenos días;こんにちは|konnichiwa|Hola, buenas tardes;こんばんは|konbanwa|Buenas noches (al llegar);おやすみ|oyasumi|Buenas noches (al dormir);ありがとう|arigatou|Gracias;すみません|sumimasen|Perdón, disculpe;さようなら|sayounara|Adiós;はじめまして|hajimemashite|Encantado de conocerte;おねがいします|onegaishimasu|Por favor;いただきます|itadakimasu|Antes de comer"},
-  num:{name:"Números del 1 al 10", icon:"🔢", color:"#007AFF", items:"いち|ichi|Uno;に|ni|Dos;さん|san|Tres;よん|yon|Cuatro;ご|go|Cinco;ろく|roku|Seis;なな|nana|Siete;はち|hachi|Ocho;きゅう|kyuu|Nueve;じゅう|juu|Diez"},
-  days:{name:"Días y tiempo", icon:"📅", color:"#FF9500", items:"げつようび|getsuyoubi|Lunes;かようび|kayoubi|Martes;すいようび|suiyoubi|Miércoles;もくようび|mokuyoubi|Jueves;きんようび|kinyoubi|Viernes;どようび|doyoubi|Sábado;にちようび|nichiyoubi|Domingo;きょう|kyou|Hoy;あした|ashita|Mañana;きのう|kinou|Ayer"},
+  basic:{name:"Palabras esenciales", icon:"🔑", color:"#007AFF", items:"はい|hai|Sí;いいえ|iie|No;これ|kore|Esto;それ|sore|Eso;あれ|are|Aquello;ここ|koko|Aquí;どこ|doko|Dónde;なに|nani|Qué;だれ|dare|Quién;いつ|itsu|Cuándo;いくら|ikura|Cuánto cuesta;どうして|doushite|Por qué;ちょっと|chotto|Un poco, un momento;もっと|motto|Más"},
+  greet:{name:"Saludos y cortesía", icon:"👋", color:"#34C759", items:"おはよう|ohayou|Buenos días;こんにちは|konnichiwa|Hola, buenas tardes;こんばんは|konbanwa|Buenas noches (al llegar);おやすみ|oyasumi|Buenas noches (al dormir);ありがとう|arigatou|Gracias;すみません|sumimasen|Perdón, disculpe;ごめんなさい|gomennasai|Lo siento;さようなら|sayounara|Adiós;はじめまして|hajimemashite|Encantado;おねがいします|onegai shimasu|Por favor;いただきます|itadakimasu|Antes de comer;ごちそうさま|gochisousama|Después de comer;ただいま|tadaima|Ya llegué;おかえり|okaeri|Bienvenido a casa"},
+  num:{name:"Números", icon:"🔢", color:"#5856D6", items:"ゼロ|zero|Cero;いち|ichi|Uno;に|ni|Dos;さん|san|Tres;よん|yon|Cuatro;ご|go|Cinco;ろく|roku|Seis;なな|nana|Siete;はち|hachi|Ocho;きゅう|kyuu|Nueve;じゅう|juu|Diez;ひゃく|hyaku|Cien;せん|sen|Mil;まん|man|Diez mil"},
+  days:{name:"Días y tiempo", icon:"📅", color:"#FF9500", items:"げつようび|getsuyoubi|Lunes;かようび|kayoubi|Martes;すいようび|suiyoubi|Miércoles;もくようび|mokuyoubi|Jueves;きんようび|kin'youbi|Viernes;どようび|doyoubi|Sábado;にちようび|nichiyoubi|Domingo;きょう|kyou|Hoy;あした|ashita|Mañana;きのう|kinou|Ayer;あさ|asa|La mañana;ひる|hiru|El mediodía;よる|yoru|La noche;いま|ima|Ahora"},
   color:{name:"Colores", icon:"🎨", color:"#AF52DE", items:"あか|aka|Rojo;あお|ao|Azul;きいろ|kiiro|Amarillo;みどり|midori|Verde;しろ|shiro|Blanco;くろ|kuro|Negro;ちゃいろ|chairo|Marrón;むらさき|murasaki|Morado;ピンク|pinku|Rosa;オレンジ|orenji|Naranja"},
-  food:{name:"Comida y bebida", icon:"🍙", color:"#FF3B30", items:"ごはん|gohan|Arroz, comida;みず|mizu|Agua;おちゃ|ocha|Té;パン|pan|Pan;たまご|tamago|Huevo;さかな|sakana|Pescado;にく|niku|Carne;やさい|yasai|Verdura;くだもの|kudamono|Fruta;コーヒー|koohii|Café"},
-  animal:{name:"Animales", icon:"🐱", color:"#FF2D55", items:"ねこ|neko|Gato;いぬ|inu|Perro;とり|tori|Pájaro;うま|uma|Caballo;うさぎ|usagi|Conejo;ねずみ|nezumi|Ratón;くま|kuma|Oso;さる|saru|Mono;ぶた|buta|Cerdo;かえる|kaeru|Rana"},
-  people:{name:"Familia y personas", icon:"👨‍👩‍👧", color:"#5856D6", items:"おかあさん|okaasan|Madre;おとうさん|otousan|Padre;おにいさん|oniisan|Hermano mayor;おねえさん|oneesan|Hermana mayor;いもうと|imouto|Hermana menor;おとうと|otouto|Hermano menor;かぞく|kazoku|Familia;ともだち|tomodachi|Amigo;せんせい|sensei|Profesor;がくせい|gakusei|Estudiante"},
-  daily:{name:"Cosas del día a día", icon:"🏠", color:"#8E8E93", items:"ほん|hon|Libro;みせ|mise|Tienda;えき|eki|Estación;がっこう|gakkou|Escuela;うち|uchi|Casa;くるま|kuruma|Coche;でんわ|denwa|Teléfono;てがみ|tegami|Carta;なまえ|namae|Nombre;おかね|okane|Dinero"},
-  loan:{name:"Préstamos en katakana", icon:"🌍", color:"#30B0C7", items:"テレビ|terebi|Televisión;パソコン|pasokon|Ordenador;ホテル|hoteru|Hotel;タクシー|takushii|Taxi;バス|basu|Autobús;カメラ|kamera|Cámara;ケーキ|keeki|Pastel;アイス|aisu|Helado;ビール|biiru|Cerveza;ドア|doa|Puerta"}
+  food:{name:"Comida y bebida", icon:"🍙", color:"#FF3B30", items:"ごはん|gohan|Arroz, comida;みず|mizu|Agua;おちゃ|ocha|Té;パン|pan|Pan;たまご|tamago|Huevo;さかな|sakana|Pescado;にく|niku|Carne;やさい|yasai|Verdura;くだもの|kudamono|Fruta;コーヒー|koohii|Café;ラーメン|raamen|Ramen;すし|sushi|Sushi;ビール|biiru|Cerveza;おかし|okashi|Dulces, snacks"},
+  konbini:{name:"En el konbini", icon:"🏪", color:"#30B0C7", items:"ふくろ|fukuro|Bolsa;おはし|ohashi|Palillos;スプーン|supuun|Cuchara;フォーク|fooku|Tenedor;ストロー|sutoroo|Popote, pajita;レシート|reshiito|Recibo;おべんとう|obentou|Bento, comida para llevar;おにぎり|onigiri|Onigiri;レジ|reji|Caja;げんきん|genkin|Efectivo;おつり|otsuri|El cambio;にんき|ninki|Popular"},
+  station:{name:"En la estación", icon:"🚉", color:"#0A84FF", items:"えき|eki|Estación;きっぷ|kippu|Billete, boleto;かいさつ|kaisatsu|Torniquete de acceso;ホーム|hoomu|Andén;のりかえ|norikae|Transbordo;でぐち|deguchi|Salida;いりぐち|iriguchi|Entrada;でんしゃ|densha|Tren;ちかてつ|chikatetsu|Metro;しんかんせん|shinkansen|Tren bala;バス|basu|Autobús;おうふく|oufuku|Ida y vuelta"},
+  hotel:{name:"En el hotel", icon:"🏨", color:"#BF5AF2", items:"よやく|yoyaku|Reserva;へや|heya|Habitación;かぎ|kagi|Llave;にもつ|nimotsu|Equipaje;あさごはん|asagohan|Desayuno;タオル|taoru|Toalla;エレベーター|erebeetaa|Ascensor;フロント|furonto|Recepción;おふろ|ofuro|Baño, bañera;トイレ|toire|Servicio, baño"},
+  place:{name:"Lugares", icon:"🏙️", color:"#FF2D55", items:"こうえん|kouen|Parque;びょういん|byouin|Hospital;ぎんこう|ginkou|Banco;ゆうびんきょく|yuubinkyoku|Oficina de correos;としょかん|toshokan|Biblioteca;スーパー|suupaa|Supermercado;コンビニ|konbini|Tienda de conveniencia;くうこう|kuukou|Aeropuerto;おてら|otera|Templo budista;じんじゃ|jinja|Santuario sintoísta;みせ|mise|Tienda;がっこう|gakkou|Escuela"},
+  verb:{name:"Verbos básicos", icon:"🏃", color:"#32ADE6", items:"たべる|taberu|Comer;のむ|nomu|Beber;いく|iku|Ir;くる|kuru|Venir;みる|miru|Ver, mirar;きく|kiku|Escuchar, preguntar;する|suru|Hacer;かう|kau|Comprar;よむ|yomu|Leer;かく|kaku|Escribir;わかる|wakaru|Entender;はなす|hanasu|Hablar;ねる|neru|Dormir;おきる|okiru|Levantarse"},
+  adj:{name:"Adjetivos útiles", icon:"📏", color:"#FF9F0A", items:"おおきい|ookii|Grande;ちいさい|chiisai|Pequeño;たかい|takai|Caro, alto;やすい|yasui|Barato;あつい|atsui|Caliente, caluroso;さむい|samui|Frío (clima);おいしい|oishii|Delicioso;たのしい|tanoshii|Divertido;いい|ii|Bueno;わるい|warui|Malo;ちかい|chikai|Cerca;とおい|tooi|Lejos;はやい|hayai|Rápido, temprano;からい|karai|Picante"},
+  dir:{name:"Direcciones", icon:"🧭", color:"#64D2FF", items:"みぎ|migi|Derecha;ひだり|hidari|Izquierda;まえ|mae|Delante;うしろ|ushiro|Detrás;うえ|ue|Arriba;した|shita|Abajo;なか|naka|Dentro;となり|tonari|Al lado;ちかく|chikaku|Cerca de;まっすぐ|massugu|Recto"},
+  body:{name:"El cuerpo y la salud", icon:"🩺", color:"#FF6482", items:"あたま|atama|Cabeza;め|me|Ojo;はな|hana|Nariz;くち|kuchi|Boca;みみ|mimi|Oreja;て|te|Mano;あし|ashi|Pie, pierna;おなか|onaka|Barriga, estómago;のど|nodo|Garganta;くすり|kusuri|Medicina;いたい|itai|Me duele;ねつ|netsu|Fiebre"},
+  weather:{name:"El clima", icon:"🌤️", color:"#5AC8FA", items:"てんき|tenki|El tiempo;はれ|hare|Despejado;くもり|kumori|Nublado;あめ|ame|Lluvia;ゆき|yuki|Nieve;かぜ|kaze|Viento;なつ|natsu|Verano;ふゆ|fuyu|Invierno;はる|haru|Primavera;あき|aki|Otoño"},
+  animal:{name:"Animales", icon:"🐱", color:"#FF375F", items:"ねこ|neko|Gato;いぬ|inu|Perro;とり|tori|Pájaro;うま|uma|Caballo;うさぎ|usagi|Conejo;ねずみ|nezumi|Ratón;くま|kuma|Oso;さる|saru|Mono;ぶた|buta|Cerdo;かえる|kaeru|Rana"},
+  people:{name:"Familia y personas", icon:"👨‍👩‍👧", color:"#6C5CE7", items:"おかあさん|okaasan|Madre;おとうさん|otousan|Padre;おにいさん|oniisan|Hermano mayor;おねえさん|oneesan|Hermana mayor;いもうと|imouto|Hermana menor;おとうと|otouto|Hermano menor;かぞく|kazoku|Familia;ともだち|tomodachi|Amigo;せんせい|sensei|Profesor;がくせい|gakusei|Estudiante;ひと|hito|Persona;こども|kodomo|Niño"},
+  daily:{name:"Cosas del día a día", icon:"🏠", color:"#8E8E93", items:"ほん|hon|Libro;うち|uchi|Casa;くるま|kuruma|Coche;でんわ|denwa|Teléfono;てがみ|tegami|Carta;なまえ|namae|Nombre;おかね|okane|Dinero;さいふ|saifu|Cartera;かさ|kasa|Paraguas;とけい|tokei|Reloj;しごと|shigoto|Trabajo;みち|michi|Camino, calle"},
+  loan:{name:"Préstamos en katakana", icon:"🌍", color:"#A2845E", items:"テレビ|terebi|Televisión;パソコン|pasokon|Ordenador;スマホ|sumaho|Móvil, celular;ホテル|hoteru|Hotel;タクシー|takushii|Taxi;カメラ|kamera|Cámara;ケーキ|keeki|Pastel;アイス|aisu|Helado;ドア|doa|Puerta;チケット|chiketto|Entrada, boleto;カード|kaado|Tarjeta;ワイファイ|waifai|Wifi"}
 };
+
 /* Oraciones de uso diario, todas escribibles en kana. Los espacios separan palabras:
    el japonés real no los usa, pero sin kanji la lectura corrida es ilegible para quien empieza. */
 const PHRASES = {
   greet:{name:"Saludos y despedidas", icon:"👋", color:"#34C759", items:"おはようございます|ohayou gozaimasu|Buenos días (formal);こんにちは|konnichiwa|Hola, buenas tardes;こんばんは|konbanwa|Buenas noches (al llegar);おげんきですか|ogenki desu ka|¿Cómo estás?;げんきです|genki desu|Estoy bien;おひさしぶりです|ohisashiburi desu|Cuánto tiempo sin verte;また あした|mata ashita|Hasta mañana;いってきます|ittekimasu|Me voy (al salir de casa);いってらっしゃい|itterasshai|Que te vaya bien;ただいま|tadaima|Ya llegué;おかえりなさい|okaerinasai|Bienvenido a casa;おやすみなさい|oyasuminasai|Buenas noches (al dormir)"},
-  intro:{name:"Presentarse", icon:"🙋", color:"#5856D6", items:"はじめまして|hajimemashite|Encantado de conocerte;どうぞ よろしく おねがいします|douzo yoroshiku onegaishimasu|Mucho gusto, cuento contigo;おなまえは なんですか|onamae wa nan desu ka|¿Cómo te llamas?;わたしは メキシコじんです|watashi wa mekishikojin desu|Soy mexicano;メキシコから きました|mekishiko kara kimashita|Vengo de México;にほんごを べんきょうしています|nihongo o benkyou shite imasu|Estoy estudiando japonés;がくせいです|gakusei desu|Soy estudiante;なんさいですか|nansai desu ka|¿Cuántos años tienes?"},
-  polite:{name:"Cortesía y disculpas", icon:"🙏", color:"#FF9500", items:"ありがとうございます|arigatou gozaimasu|Muchas gracias;どういたしまして|dou itashimashite|De nada;すみません|sumimasen|Perdón, disculpe;ごめんなさい|gomen nasai|Lo siento;だいじょうぶです|daijoubu desu|Está bien, no pasa nada;おねがいします|onegaishimasu|Por favor;しつれいします|shitsurei shimasu|Con permiso;いただきます|itadakimasu|Antes de empezar a comer;ごちそうさまでした|gochisousama deshita|Al terminar de comer"},
-  ask:{name:"Preguntas básicas", icon:"❓", color:"#007AFF", items:"これは なんですか|kore wa nan desu ka|¿Qué es esto?;いくらですか|ikura desu ka|¿Cuánto cuesta?;トイレは どこですか|toire wa doko desu ka|¿Dónde está el baño?;なんじですか|nanji desu ka|¿Qué hora es?;だれですか|dare desu ka|¿Quién es?;いつですか|itsu desu ka|¿Cuándo es?;どうしてですか|doushite desu ka|¿Por qué?;えいごが わかりますか|eigo ga wakarimasu ka|¿Entiende inglés?"},
-  shop:{name:"En un restaurante o tienda", icon:"🍜", color:"#FF3B30", items:"メニューを おねがいします|menyuu o onegaishimasu|El menú, por favor;これを ください|kore o kudasai|Deme esto;おすすめは なんですか|osusume wa nan desu ka|¿Qué me recomienda?;みずを ください|mizu o kudasai|Agua, por favor;おいしいです|oishii desu|Está delicioso;カードで はらえますか|kaado de haraemasu ka|¿Puedo pagar con tarjeta?;テイクアウトで おねがいします|teikuauto de onegaishimasu|Para llevar, por favor;おかいけい おねがいします|okaikei onegaishimasu|La cuenta, por favor"},
-  help:{name:"Cuando no entiendes", icon:"🆘", color:"#AF52DE", items:"わかりません|wakarimasen|No entiendo;もういちど おねがいします|mou ichido onegaishimasu|Otra vez, por favor;ゆっくり おねがいします|yukkuri onegaishimasu|Más despacio, por favor;にほんごが すこし わかります|nihongo ga sukoshi wakarimasu|Entiendo un poco de japonés;なんて いいますか|nante iimasu ka|¿Cómo se dice?;しりません|shirimasen|No lo sé;だいじょうぶですか|daijoubu desu ka|¿Estás bien?;たすけて ください|tasukete kudasai|Ayúdeme, por favor"},
-  travel:{name:"Moverse por la ciudad", icon:"🚉", color:"#30B0C7", items:"えきは どこですか|eki wa doko desu ka|¿Dónde está la estación?;まっすぐ いってください|massugu itte kudasai|Siga derecho, por favor;みぎに まがってください|migi ni magatte kudasai|Gire a la derecha;ひだりに まがってください|hidari ni magatte kudasai|Gire a la izquierda;ちかいですか|chikai desu ka|¿Está cerca?;タクシーを よんでください|takushii o yonde kudasai|Llame un taxi, por favor;ホテルまで おねがいします|hoteru made onegaishimasu|Al hotel, por favor;でんしゃで いきます|densha de ikimasu|Voy en tren"},
-  daily:{name:"Frases del día a día", icon:"💬", color:"#FF2D55", items:"おなかが すきました|onaka ga sukimashita|Tengo hambre;のどが かわきました|nodo ga kawakimashita|Tengo sed;つかれました|tsukaremashita|Estoy cansado;ちょっと まってください|chotto matte kudasai|Espere un momento;きょうは いい てんきですね|kyou wa ii tenki desu ne|Hoy hace buen tiempo, ¿verdad?;たのしかったです|tanoshikatta desu|Estuvo divertido;すごいですね|sugoi desu ne|Qué impresionante;そうですね|sou desu ne|Sí, así es;がんばって|ganbatte|¡Ánimo!"}
+  intro:{name:"Presentarse", icon:"🙋", color:"#5856D6", items:"はじめまして|hajimemashite|Encantado de conocerte;どうぞ よろしく おねがいします|douzo yoroshiku onegai shimasu|Mucho gusto, cuento contigo;おなまえは なんですか|onamae wa nan desu ka|¿Cómo te llamas?;わたしは メキシコじんです|watashi wa mekishikojin desu|Soy mexicano;メキシコから きました|mekishiko kara kimashita|Vengo de México;にほんごを べんきょうしています|nihongo o benkyoushiteimasu|Estoy estudiando japonés;にほんごは まだ へたです|nihongo wa mada heta desu|Todavía hablo mal japonés;がくせいです|gakusei desu|Soy estudiante;なんさいですか|nansai desu ka|¿Cuántos años tienes?;しゅみは なんですか|shumi wa nan desu ka|¿Qué aficiones tienes?"},
+  polite:{name:"Cortesía y disculpas", icon:"🙏", color:"#FF9500", items:"ありがとうございます|arigatou gozaimasu|Muchas gracias;どういたしまして|douitashimashite|De nada;すみません|sumimasen|Perdón, disculpe;ごめんなさい|gomennasai|Lo siento;だいじょうぶです|daijoubu desu|Está bien, no pasa nada;おねがいします|onegai shimasu|Por favor;しつれいします|shitsurei shimasu|Con permiso;おさきに どうぞ|osaki ni douzo|Usted primero;いただきます|itadakimasu|Antes de empezar a comer;ごちそうさまでした|gochisousama deshita|Al terminar de comer"},
+  ask:{name:"Preguntas básicas", icon:"❓", color:"#007AFF", items:"これは なんですか|kore wa nan desu ka|¿Qué es esto?;いくらですか|ikura desu ka|¿Cuánto cuesta?;トイレは どこですか|toire wa doko desu ka|¿Dónde está el baño?;なんじですか|nanji desu ka|¿Qué hora es?;だれですか|dare desu ka|¿Quién es?;いつですか|itsu desu ka|¿Cuándo es?;どうしてですか|doushite desu ka|¿Por qué?;えいごが わかりますか|eigo ga wakarimasu ka|¿Entiende inglés?;しゃしんを とっても いいですか|shashin o tottemo ii desu ka|¿Puedo hacer una foto?;ここに すわっても いいですか|koko ni suwattemo ii desu ka|¿Me puedo sentar aquí?"},
+  help:{name:"Cuando no entiendes", icon:"🆘", color:"#AF52DE", items:"わかりません|wakarimasen|No entiendo;もういちど おねがいします|mouichido onegai shimasu|Otra vez, por favor;ゆっくり おねがいします|yukkuri onegai shimasu|Más despacio, por favor;にほんごが すこし わかります|nihongo ga sukoshi wakarimasu|Entiendo un poco de japonés;なんて いいますか|nante iimasu ka|¿Cómo se dice?;しりません|shirimasen|No lo sé;ここに かいて ください|koko ni kaite kudasai|Escríbamelo aquí, por favor;えいごの ひとは いますか|eigo no hito wa imasu ka|¿Hay alguien que hable inglés?;だいじょうぶですか|daijoubu desu ka|¿Estás bien?;スマホで ほんやくします|sumaho de hon'yaku shimasu|Lo traduzco con el móvil"},
+  konbini:{name:"En el konbini", icon:"🏪", color:"#30B0C7", items:"いらっしゃいませ|irasshaimase|Bienvenido (lo dice el personal);ふくろは ごりようですか|fukuro wa goriyou desu ka|¿Quiere bolsa? (se lo preguntarán);あたためますか|atatamemasu ka|¿Se lo caliento? (se lo preguntarán);おはしは おつけしますか|ohashi wa otsuke shimasu ka|¿Le pongo palillos? (se lo preguntarán);はい おねがいします|hai onegai shimasu|Sí, por favor;だいじょうぶです|daijoubu desu|Así está bien, no gracias;ふくろは いりません|fukuro wa irimasen|No necesito bolsa;ふくろを ください|fukuro o kudasai|Una bolsa, por favor;あたためて ください|atatamete kudasai|Caliéntemelo, por favor;おはしを ください|ohashi o kudasai|Palillos, por favor;べつべつに いれて ください|betsubetsu ni irete kudasai|En bolsas separadas, por favor;レシートを ください|reshiito o kudasai|El recibo, por favor;カードで おねがいします|kaado de onegai shimasu|Con tarjeta, por favor;げんきんで おねがいします|genkin de onegai shimasu|En efectivo, por favor"},
+  food:{name:"En un restaurante", icon:"🍜", color:"#FF3B30", items:"なんめいさまですか|nanmeisama desu ka|¿Cuántas personas son? (se lo preguntarán);ふたりです|futari desu|Somos dos;メニューを ください|menyuu o kudasai|El menú, por favor;えいごの メニューは ありますか|eigo no menyuu wa arimasu ka|¿Tienen menú en inglés?;おすすめは なんですか|osusume wa nan desu ka|¿Qué me recomienda?;これを ください|kore o kudasai|Esto, por favor;ラーメンを ひとつ おねがいします|raamen o hitotsu onegai shimasu|Un ramen, por favor;ビールを ふたつ おねがいします|biiru o futatsu onegai shimasu|Dos cervezas, por favor;おみずを ください|omizu o kudasai|Agua, por favor;おかわりを おねがいします|okawari o onegai shimasu|Otra ración, por favor;おいしいです|oishii desu|Está delicioso;おかいけい おねがいします|okaikei onegai shimasu|La cuenta, por favor;べつべつに はらえますか|betsubetsu ni haraemasu ka|¿Podemos pagar por separado?;テイクアウトは できますか|teikuauto wa dekimasu ka|¿Se puede para llevar?"},
+  diet:{name:"Alergias y comida especial", icon:"🥗", color:"#FF6482", items:"アレルギーが あります|arerugii ga arimasu|Tengo alergia;たまごは たべられません|tamago wa taberaremasen|No puedo comer huevo;えびは たべられません|ebi wa taberaremasen|No puedo comer camarón;にくは たべません|niku wa tabemasen|No como carne;さかなも たべません|sakana mo tabemasen|Tampoco como pescado;ベジタリアンです|bejitarian desu|Soy vegetariano;これに にくは はいっていますか|kore ni niku wa haitteimasu ka|¿Esto lleva carne?;からいですか|karai desu ka|¿Pica?"},
+  train:{name:"En el tren y el metro", icon:"🚉", color:"#0A84FF", items:"きっぷは どこで かえますか|kippu wa doko de kaemasu ka|¿Dónde compro el billete?;とうきょうまでの きっぷを ください|toukyou made no kippu o kudasai|Un billete hasta Tokio, por favor;なんばんせんですか|nanbansen desu ka|¿De qué andén sale?;ホームは どこですか|hoomu wa doko desu ka|¿Dónde está el andén?;この でんしゃは しぶやに いきますか|kono densha wa shibuya ni ikimasu ka|¿Este tren va a Shibuya?;のりかえは どこですか|norikae wa doko desu ka|¿Dónde hago el transbordo?;つぎは なんの えきですか|tsugi wa nan no eki desu ka|¿Cuál es la próxima estación?;かいさつは どこですか|kaisatsu wa doko desu ka|¿Dónde está el torniquete?;でぐちは どこですか|deguchi wa doko desu ka|¿Dónde está la salida?;スイカは つかえますか|suika wa tsukaemasu ka|¿Puedo usar la tarjeta Suica?;おります|orimasu|Voy a bajar (para pasar);しゅうでんは なんじですか|shuuden wa nanji desu ka|¿A qué hora es el último tren?"},
+  airport:{name:"En el aeropuerto", icon:"✈️", color:"#64D2FF", items:"チェックインは どこですか|chekkuin wa doko desu ka|¿Dónde se factura?;パスポートです|pasupooto desu|Aquí tiene mi pasaporte;かんこうです|kankou desu|Vengo de turismo;いっしゅうかん たいざいします|isshuukan taizai shimasu|Me quedo una semana;ホテルに とまります|hoteru ni tomarimasu|Me alojo en un hotel;にもつは どこで うけとりますか|nimotsu wa doko de uketorimasu ka|¿Dónde recojo el equipaje?;まどがわの せきを おねがいします|madogawa no seki o onegai shimasu|Asiento de ventanilla, por favor;つうろがわの せきを おねがいします|tsuurogawa no seki o onegai shimasu|Asiento de pasillo, por favor;とうじょうぐちは どこですか|toujouguchi wa doko desu ka|¿Dónde está la puerta de embarque?;でんしゃの えきは どこですか|densha no eki wa doko desu ka|¿Dónde está la estación de tren?"},
+  hotel:{name:"En el hotel", icon:"🏨", color:"#BF5AF2", items:"チェックインを おねがいします|chekkuin o onegai shimasu|Quisiera registrarme;よやくが あります|yoyaku ga arimasu|Tengo una reserva;チェックアウトは なんじですか|chekkuauto wa nanji desu ka|¿A qué hora hay que dejar la habitación?;にもつを あずかって もらえますか|nimotsu o azukatte moraemasu ka|¿Me pueden guardar el equipaje?;あさごはんは ついていますか|asagohan wa tsuiteimasu ka|¿Incluye desayuno?;ワイファイの パスワードを おしえて ください|waifai no pasuwaado o oshiete kudasai|La contraseña del wifi, por favor;タオルを もういちまい ください|taoru o mouichimai kudasai|Otra toalla, por favor;へやを かえて もらえますか|heya o kaete moraemasu ka|¿Pueden cambiarme de habitación?;タクシーを よんで ください|takushii o yonde kudasai|Llame un taxi, por favor;かぎを なくしました|kagi o nakushimashita|He perdido la llave;ちかくに おすすめの みせは ありますか|chikaku ni osusume no mise wa arimasu ka|¿Hay algún sitio bueno cerca?;おせわに なりました|osewa ni narimashita|Gracias por todo (al marcharse)"},
+  shop:{name:"De compras", icon:"🛍️", color:"#FF2D55", items:"これは いくらですか|kore wa ikura desu ka|¿Cuánto cuesta esto?;みているだけです|miteirudake desu|Solo estoy mirando;しちゃくしても いいですか|shichakushitemo ii desu ka|¿Me lo puedo probar?;もっと おおきいのは ありますか|motto ookii no wa arimasu ka|¿Tiene una talla más grande?;ちがう いろは ありますか|chigau iro wa arimasu ka|¿Lo tiene en otro color?;カードは つかえますか|kaado wa tsukaemasu ka|¿Aceptan tarjeta?;めんぜいは できますか|menzei wa dekimasu ka|¿Se puede hacer tax free?;プレゼントようで おねがいします|purezentoyou de onegai shimasu|Para regalo, por favor;これを ください|kore o kudasai|Me llevo esto;また きます|mata kimasu|Volveré"},
+  way:{name:"Preguntar el camino", icon:"🧭", color:"#32ADE6", items:"すみません みちを おしえて ください|sumimasen michi o oshiete kudasai|Perdone, ¿me indica el camino?;ここは どこですか|koko wa doko desu ka|¿Dónde estoy?;えきは どこですか|eki wa doko desu ka|¿Dónde está la estación?;ちかいですか|chikai desu ka|¿Está cerca?;あるいて いけますか|aruite ikemasu ka|¿Se puede ir andando?;どのくらい かかりますか|donokurai kakarimasu ka|¿Cuánto se tarda?;まっすぐ いって ください|massugu itte kudasai|Siga derecho;みぎに まがって ください|migi ni magatte kudasai|Gire a la derecha;ひだりに まがって ください|hidari ni magatte kudasai|Gire a la izquierda;ちずを かいて もらえますか|chizu o kaite moraemasu ka|¿Me lo dibuja en un plano?"},
+  emerg:{name:"Emergencias y salud", icon:"🚑", color:"#FF453A", items:"たすけて ください|tasukete kudasai|¡Ayúdeme!;きゅうきゅうしゃを よんで ください|kyuukyuusha o yonde kudasai|Llame a una ambulancia;けいさつを よんで ください|keisatsu o yonde kudasai|Llame a la policía;びょういんは どこですか|byouin wa doko desu ka|¿Dónde hay un hospital?;ぐあいが わるいです|guai ga warui desu|Me siento mal;あたまが いたいです|atama ga itai desu|Me duele la cabeza;おなかが いたいです|onaka ga itai desu|Me duele el estómago;ねつが あります|netsu ga arimasu|Tengo fiebre;くすりが ほしいです|kusuri ga hoshii desu|Necesito una medicina;さいふを なくしました|saifu o nakushimashita|He perdido la cartera"},
+  daily:{name:"Frases del día a día", icon:"💬", color:"#8E8E93", items:"おなかが すきました|onaka ga sukimashita|Tengo hambre;のどが かわきました|nodo ga kawakimashita|Tengo sed;つかれました|tsukaremashita|Estoy cansado;ちょっと まって ください|chotto matte kudasai|Espere un momento;きょうは いい てんきですね|kyou wa ii tenki desu ne|Hoy hace buen tiempo, ¿verdad?;たのしかったです|tanoshikatta desu|Estuvo divertido;すごいですね|sugoi desu ne|Qué impresionante;そうですね|sou desu ne|Sí, así es;がんばって|ganbatte|¡Ánimo!;きを つけて|ki o tsukete|Cuídate;よかったです|yokatta desu|Me alegro;もちろんです|mochiron desu|Por supuesto"}
 };
+
+const ROMA = {
+  "あ":"a","い":"i","う":"u","え":"e","お":"o",
+  "か":"ka","き":"ki","く":"ku","け":"ke","こ":"ko","が":"ga","ぎ":"gi","ぐ":"gu","げ":"ge","ご":"go",
+  "さ":"sa","し":"shi","す":"su","せ":"se","そ":"so","ざ":"za","じ":"ji","ず":"zu","ぜ":"ze","ぞ":"zo",
+  "た":"ta","ち":"chi","つ":"tsu","て":"te","と":"to","だ":"da","ぢ":"ji","づ":"zu","で":"de","ど":"do",
+  "な":"na","に":"ni","ぬ":"nu","ね":"ne","の":"no",
+  "は":"ha","ひ":"hi","ふ":"fu","へ":"he","ほ":"ho","ば":"ba","び":"bi","ぶ":"bu","べ":"be","ぼ":"bo",
+  "ぱ":"pa","ぴ":"pi","ぷ":"pu","ぺ":"pe","ぽ":"po",
+  "ま":"ma","み":"mi","む":"mu","め":"me","も":"mo",
+  "や":"ya","ゆ":"yu","よ":"yo","ら":"ra","り":"ri","る":"ru","れ":"re","ろ":"ro",
+  "わ":"wa","ゐ":"i","ゑ":"e","を":"o","ん":"n","ゔ":"vu",
+  "ぁ":"a","ぃ":"i","ぅ":"u","ぇ":"e","ぉ":"o","ゃ":"ya","ゅ":"yu","ょ":"yo"
+};
+const DIGRAPH = {
+  "きゃ":"kya","きゅ":"kyu","きょ":"kyo","しゃ":"sha","しゅ":"shu","しょ":"sho","ちゃ":"cha","ちゅ":"chu","ちょ":"cho",
+  "にゃ":"nya","にゅ":"nyu","にょ":"nyo","ひゃ":"hya","ひゅ":"hyu","ひょ":"hyo","みゃ":"mya","みゅ":"myu","みょ":"myo",
+  "りゃ":"rya","りゅ":"ryu","りょ":"ryo","ぎゃ":"gya","ぎゅ":"gyu","ぎょ":"gyo","じゃ":"ja","じゅ":"ju","じょ":"jo",
+  "ぢゃ":"ja","ぢゅ":"ju","ぢょ":"jo","びゃ":"bya","びゅ":"byu","びょ":"byo","ぴゃ":"pya","ぴゅ":"pyu","ぴょ":"pyo",
+  "しぇ":"she","じぇ":"je","ちぇ":"che","てぃ":"ti","でぃ":"di","とぅ":"tu","どぅ":"du",
+  "ふぁ":"fa","ふぃ":"fi","ふぇ":"fe","ふぉ":"fo","うぃ":"wi","うぇ":"we","うぉ":"wo",
+  "ゔぁ":"va","ゔぃ":"vi","ゔぇ":"ve","ゔぉ":"vo","くぁ":"kwa","つぁ":"tsa","つぇ":"tse","つぉ":"tso"
+};
+const isKanaOnly = s => /^[\u3041-\u3096\u30A1-\u30FA\u30FC\u3000\s・、。ー]+$/.test(s) && /[\u3041-\u30FA]/.test(s);
+const toHira = s => s.replace(/[\u30A1-\u30F6]/g, c => String.fromCharCode(c.charCodeAt(0)-0x60));
+
+/* Saludos cuya は final es partícula aunque vayan sueltos */
+const ROMA_WORD = {"こんにちは":"konnichiwa","こんばんは":"konbanwa"};
+
+function kanaToRomaji(input){
+  const toks = input.trim().split(/\s+/);
+  return toks.map(tok=>{
+    if(ROMA_WORD[tok]) return ROMA_WORD[tok];
+    let s = toHira(tok), tail = "";
+    // は/へ/を al final de palabra son partículas y se leen wa/e/o, no ha/he/wo.
+    // を prácticamente solo existe como partícula; は y へ solo se tratan así
+    // cuando el texto viene separado en palabras, es decir, cuando es una frase.
+    if(s === "は" || s === "へ" || s === "を") return {"は":"wa","へ":"e","を":"o"}[s];
+    if(s.length > 1){
+      const last = s.slice(-1);
+      if(last === "を" || (toks.length > 1 && (last === "は" || last === "へ"))){
+        tail = " " + {"は":"wa","へ":"e","を":"o"}[last];
+        s = s.slice(0,-1);
+      }
+    }
+    let out = "", i = 0;
+    while(i < s.length){
+      const two = s.slice(i,i+2);
+      if(DIGRAPH[two]){ out += DIGRAPH[two]; i += 2; continue; }
+      const c = s[i];
+      if(c === "っ"){                                  // っ duplica la consonante siguiente
+        const nx = DIGRAPH[s.slice(i+1,i+3)] || ROMA[s[i+1]] || "";
+        out += nx ? (nx[0]==="c" ? "t" : nx[0]) : "";   // っち -> tchi, no cchi
+        i++; continue;
+      }
+      if(c === "ー"){ const v = out.match(/[aeiou]$/); out += v ? v[0] : ""; i++; continue; }
+      if(c === "ん"){                                   // n' ante vocal o y, para no leer んあ como "na"
+        const nx = ROMA[s[i+1]] || "";
+        out += (nx && /^[aeiouy]/.test(nx)) ? "n'" : "n";
+        i++; continue;
+      }
+      if(ROMA[c]){ out += ROMA[c]; i++; continue; }
+      out += c; i++;                                    // signos de puntuación y demás, tal cual
+    }
+    return out + tail;
+  }).join(" ");
+}
+
 const CATALOG = {words:{data:WORDS, screen:"s-words", back:"Palabras", unit:"palabras"},
                  phrases:{data:PHRASES, screen:"s-phrases", back:"Oraciones", unit:"oraciones"}};
 const itemsOf = (kind,cat) => CATALOG[kind].data[cat].items.split(";").map(s=>{const [k,r,m]=s.split("|");return {k,r,m};});
@@ -692,7 +850,7 @@ const SIM = {};
 })();
 
 /* ---------- Estado ---------- */
-const DEF_SETTINGS = {theme:"auto", sets:{basic:true,dakuten:false,yoon:false,kbasic:false,kdakuten:false,kyoon:false}, dir:"jp", audio:false, answerMode:"choice", sheetView:"strokes", gridContrast:"med", rate:"normal", voiceURI:"", hardOptions:true};
+const DEF_SETTINGS = {theme:"auto", sets:{basic:true,dakuten:false,yoon:false,kbasic:false,kdakuten:false,kyoon:false}, dir:"jp", audio:false, answerMode:"choice", sheetView:"strokes", gridContrast:"med", rate:"normal", voiceURI:"", hardOptions:true, inkColor:"auto", smoothInk:true};
 
 // romanizaciones alternativas aceptadas al escribir (nihon-shiki → hepburn)
 const ALT = {si:"shi",ti:"chi",tu:"tsu",hu:"fu",zi:"ji",di:"ji",du:"zu",nn:"n",
@@ -704,6 +862,8 @@ let S = JSON.parse(JSON.stringify(DEF_SETTINGS));
 let P = {};       // progreso por carácter: {box, ok, ko}
 let R = {};       // récords por configuración
 let DY = [];      // días con práctica, como "AAAA-MM-DD"
+let MISS = [];    // kana fallados, del más reciente al más antiguo
+let DICT = [];    // diccionario propio del usuario
 let lastRun = null;
 
 /* ---------- Almacenamiento (artifact / archivo local / memoria) ---------- */
@@ -720,7 +880,7 @@ const Store = {
     try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
   }
 };
-const save = () => { Store.set("hira_settings",S); Store.set("hira_progress",P); Store.set("hira_records",R); Store.set("hira_days",DY); };
+const save = () => { Store.set("hira_settings",S); Store.set("hira_progress",P); Store.set("hira_records",R); Store.set("hira_days",DY); Store.set("hira_misses",MISS); Store.set("hira_dict",DICT); };
 
 /* Fecha local, no UTC: a las 23:00 en México toUTCString() ya sería el día siguiente */
 function dayKey(d){
@@ -764,6 +924,7 @@ function show(id){
   if(id==="s-settings") renderSettings();
   if(id==="s-words") renderCategories("words", "#cat-list");
   if(id==="s-phrases") renderCategories("phrases", "#phr-list");
+  if(id==="s-dict") renderDict();
   if(id==="s-backup") renderBackup();
   if(id==="s-ta-setup"||id==="s-sv-setup") renderRecords();
 }
@@ -919,6 +1080,7 @@ function nextCard(){
   // si ya hay un campo de escritura en pantalla, se reutiliza para no cerrar el teclado del móvil
   const reuse = useType && stage.querySelector("#ans") && stage.querySelector("#card");
   if(reuse){
+    const after = $("#after"); if(after) after.remove();
     const c = $("#card"); c.className = "card"; c.innerHTML = cardHTML;
     const i = $("#ans"); i.value = ""; i.className = ""; i.readOnly = false; i.focus();
   } else {
@@ -969,6 +1131,7 @@ function answer(a){
     G.ko++; G.streak=0;
     p.ko++; p.box = G.mode==="study" ? 0 : Math.max(0,p.box-1);
     if(!G.wrong.includes(card.k)) G.wrong.push(card.k);
+    MISS = [card.k, ...MISS.filter(k=>k!==card.k)].slice(0,30);
     const pen = G.mode==="ta" ? 20 : G.mode==="sv" ? 50 : 0;
     G.lostPoints += pen; G.score = Math.max(0, G.score - pen);
   }
@@ -991,8 +1154,24 @@ function answer(a){
   renderHud();
   save();
 
-  const wait = right ? 500 : (a.timeout ? 950 : 900);
-  setTimeout(()=>{ if(!G) return; if(G.mode==="sv" && G.n>=G.cfg.count) endGame(); else nextCard(); }, wait);
+  if(G.mode==="study"){
+    // sin avance automático: da tiempo a mirar el error antes de continuar
+    stage.insertAdjacentHTML("beforeend",
+      `<div class="after" id="after">
+         <button class="btn secondary" id="a-practice">Practicar este carácter</button>
+         <button class="btn" id="a-next">Siguiente</button>
+       </div>`);
+    $("#a-practice").addEventListener("click", ()=> openSheet(card.k));
+    $("#a-next").addEventListener("click", advance);
+  } else {
+    const wait = right ? 500 : (a.timeout ? 950 : 900);
+    setTimeout(()=>{ if(!G) return; advance(); }, wait);
+  }
+}
+
+function advance(){
+  if(!G) return;
+  if(G.mode==="sv" && G.n>=G.cfg.count) endGame(); else nextCard();
 }
 
 function endGame(){
@@ -1007,6 +1186,13 @@ function endGame(){
   renderResults(g);
   show("s-results");
 }
+
+/* ---------- Chips de repaso ---------- */
+function chipsHTML(list){
+  return list.map(k=>{ const c = ALL.find(x=>x.k===k); if(!c) return "";
+    return `<button class="chip" data-kana="${c.k}"><b class="kana-font">${c.k}</b>${c.r}</button>`; }).join("");
+}
+function bindChips(sel){ $$(sel+" .chip").forEach(b=>b.addEventListener("click",()=>openSheet(b.dataset.kana))); }
 
 /* ---------- Resultados ---------- */
 function renderResults(g){
@@ -1034,9 +1220,10 @@ function renderResults(g){
     `<div class="row no-icon"><span class="row-body"><span class="row-title">${a}</span></span><span class="row-value">${b}</span></div>`).join("");
 
   $("#res-review").innerHTML = g.wrong.length
-    ? `<div class="section-head">Para repasar</div><div class="chips">` +
-      g.wrong.map(k=>{const c=ALL.find(x=>x.k===k); return `<span class="chip"><b class="kana-font">${c.k}</b>${c.r}</span>`;}).join("") + `</div>`
+    ? `<div class="section-head">Para repasar</div><div class="chips">${chipsHTML(g.wrong)}</div>
+       <div class="hint">Toca cualquiera para abrir su ficha y practicar el trazo.</div>`
     : (g.n ? `<div class="section-head">Para repasar</div><div class="chips"><span style="color:var(--label-2);font-size:15px">Ni un fallo. Sube el nivel en Ajustes.</span></div>` : "");
+  bindChips("#res-review");
 
   $("#res-again").onclick = ()=> startGame(g.mode, g.cfg);
 }
@@ -1051,6 +1238,14 @@ function renderHome(){
   const ta = R[`ta_${cfgTA().secs}`], sv = R[`sv_${cfgSV().count}_${cfgSV().secs}`];
   $("#home-ta").textContent = ta ? `Récord: ${ta} puntos en ${cfgTA().secs} s` : "Máximo de aciertos contrarreloj";
   $("#home-sv").textContent = sv ? `Récord: ${sv} puntos` : "Pocos segundos por tarjeta";
+  $("#home-dict").textContent = DICT.length ? `${DICT.length} palabras tuyas` : "Añade tus propias palabras";
+  const recientes = MISS.filter(k=>ALL.some(c=>c.k===k)).slice(0,10);
+  $("#home-review").innerHTML = recientes.length
+    ? `<div class="section-head">Para repasar</div><div class="chips">${chipsHTML(recientes)}</div>
+       <div class="hint">Los ${recientes.length===1?"último que fallaste":"últimos que has fallado"}. Toca uno para abrir su ficha y practicar el trazo.</div>`
+    : "";
+  bindChips("#home-review");
+
   const s = streakInfo();
   const hoy = DY.includes(dayKey());
   $("#home-streak").innerHTML = s.cur
@@ -1087,26 +1282,60 @@ function setupCanvas(){
   D.ctx = ctx; D.w = r.width; D.h = r.height;
   redrawStrokes();
 }
+/* Ramer-Douglas-Peucker: quita las muestras que no aportan forma.
+   El dedo genera decenas de puntos casi colineales y son los que hacen
+   que el trazo se vea con micro-bultos. */
+function rdp(pts, eps){
+  if(pts.length < 3) return pts;
+  let maxD = 0, idx = 0;
+  const a = pts[0], b = pts[pts.length-1];
+  const dx = b.x-a.x, dy = b.y-a.y, len = Math.hypot(dx,dy);
+  for(let i=1;i<pts.length-1;i++){
+    const p = pts[i];
+    const d = len === 0 ? Math.hypot(p.x-a.x, p.y-a.y)
+            : Math.abs(dy*p.x - dx*p.y + b.x*a.y - b.y*a.x) / len;
+    if(d > maxD){ maxD = d; idx = i; }
+  }
+  if(maxD <= eps) return [a,b];
+  return rdp(pts.slice(0,idx+1), eps).slice(0,-1).concat(rdp(pts.slice(idx), eps));
+}
+
 function strokePath(pts){
   const ctx = D.ctx, X = p=>p.x*D.w, Y = p=>p.y*D.h;
   if(pts.length===1){
     ctx.beginPath(); ctx.arc(X(pts[0]), Y(pts[0]), ctx.lineWidth/2, 0, Math.PI*2);
     ctx.fillStyle = ctx.strokeStyle; ctx.fill(); return;
   }
-  // punto medio entre muestras como ancla: suaviza sin desviarse del trazo
   ctx.beginPath(); ctx.moveTo(X(pts[0]), Y(pts[0]));
-  for(let i=1;i<pts.length-1;i++){
-    const a = pts[i], b = pts[i+1];
-    ctx.quadraticCurveTo(X(a), Y(a), (X(a)+X(b))/2, (Y(a)+Y(b))/2);
+  if(S.smoothInk){
+    // Catmull-Rom convertida a Bézier cúbica: la curva pasa por cada punto
+    // y llega a cada uno con la tangente del vecino, sin esquinas.
+    for(let i=0;i<pts.length-1;i++){
+      const p0 = pts[i-1] || pts[i], p1 = pts[i], p2 = pts[i+1], p3 = pts[i+2] || pts[i+1];
+      ctx.bezierCurveTo(
+        X(p1) + (X(p2)-X(p0))/6, Y(p1) + (Y(p2)-Y(p0))/6,
+        X(p2) - (X(p3)-X(p1))/6, Y(p2) - (Y(p3)-Y(p1))/6,
+        X(p2), Y(p2));
+    }
+  } else {
+    for(let i=1;i<pts.length-1;i++){
+      const a = pts[i], b = pts[i+1];
+      ctx.quadraticCurveTo(X(a), Y(a), (X(a)+X(b))/2, (Y(a)+Y(b))/2);
+    }
+    const last = pts[pts.length-1];
+    ctx.lineTo(X(last), Y(last));
   }
-  const last = pts[pts.length-1];
-  ctx.lineTo(X(last), Y(last));
   ctx.stroke();
+}
+const INKS = ["auto","#007AFF","#34C759","#FF9500","#FF3B30","#AF52DE","#FF2D55","#30B0C7"];
+function inkColor(){
+  const v = getComputedStyle(document.documentElement);
+  return S.inkColor === "auto" ? (v.getPropertyValue("--label").trim() || "#000") : S.inkColor;
 }
 function redrawStrokes(){
   if(!D.ctx) return;
   D.ctx.clearRect(0,0,D.w,D.h);
-  D.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#007AFF";
+  D.ctx.strokeStyle = inkColor();
   D.ctx.lineWidth = Math.max(7, D.w*0.036);
   for(const s of D.strokes) strokePath(s);
   if(D.cur) strokePath(D.cur);
@@ -1134,7 +1363,12 @@ cv.addEventListener("pointermove", e=>{
   }
   redrawStrokes();
 });
-const endStroke = ()=>{ if(!D.cur) return; D.strokes.push(D.cur); D.cur = null; redrawStrokes(); updateDrawTools(); };
+const endStroke = ()=>{
+  if(!D.cur) return;
+  // la simplificación va al soltar, no durante el trazo, para que la línea no baile mientras dibujas
+  D.strokes.push(S.smoothInk && D.cur.length > 2 ? rdp(D.cur, 0.006) : D.cur);
+  D.cur = null; redrawStrokes(); updateDrawTools();
+};
 cv.addEventListener("pointerup", endStroke);
 cv.addEventListener("pointercancel", endStroke);
 cv.addEventListener("pointerleave", endStroke);
@@ -1262,22 +1496,103 @@ function openCategory(kind, cat){
   show("s-wordlist");
 }
 
+/* ---------- Diccionario del usuario ---------- */
+const looksRomaji = s => /^[a-zA-Z'’\u00C0-\u017F\- ]+$/.test(s.trim()) && s.trim().length>0;
+const plain = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z]/g,"");
+
+function levenshtein(a,b){
+  const m = Array.from({length:a.length+1}, (_,i)=>[i, ...Array(b.length).fill(0)]);
+  for(let j=0;j<=b.length;j++) m[0][j] = j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++)
+    m[i][j] = Math.min(m[i-1][j]+1, m[i][j-1]+1, m[i-1][j-1] + (a[i-1]===b[j-1]?0:1));
+  return m[a.length][b.length];
+}
+const similar = (a,b) => { a=plain(a); b=plain(b);
+  if(!a || !b) return 0;
+  return 1 - levenshtein(a,b)/Math.max(a.length,b.length); };
+
+function parseDictLine(line){
+  const parts = line.split(",").map(s=>s.trim());
+  if(parts.length < 2) return {error:"faltan comas"};
+  const k = parts[0];
+  if(!k) return {error:"falta el japonés"};
+  const kana = isKanaOnly(k);
+  const auto = kana ? kanaToRomaji(k) : null;
+  let r, m, isAuto = false;
+
+  /* El campo del medio solo es la pronunciación si de verdad lo parece. Con kana
+     se compara contra el romaji que la app puede generar, así "ねこ, Gato, minino"
+     no confunde "Gato" con una lectura. Con kanji no hay con qué comparar, pero
+     entonces la pronunciación es obligatoria de todos modos. */
+  const mid = parts.length >= 3 && looksRomaji(parts[1])
+    && (!kana || similar(parts[1], auto) >= 0.55);
+
+  if(mid){ r = parts[1]; m = parts.slice(2).join(", "); }
+  else {
+    m = parts.slice(1).join(", ");
+    if(!kana) return {error:"lleva kanji: escribe también la pronunciación"};
+    r = auto; isAuto = true;
+  }
+  if(!m) return {error:"falta la traducción"};
+  return {k, r, m, auto:isAuto};
+}
+
+function addToDict(text){
+  const lines = text.split("\n").map(s=>s.trim()).filter(Boolean);
+  if(!lines.length) return {added:0, dup:0, errors:["No hay nada que añadir."]};
+  const have = new Set(DICT.map(e=>e.k));
+  let added = 0, dup = 0; const errors = [];
+  lines.forEach((line,i)=>{
+    const e = parseDictLine(line);
+    if(e.error){ errors.push(`Línea ${i+1}: ${e.error}`); return; }
+    if(have.has(e.k)){ dup++; return; }
+    have.add(e.k); DICT.push(e); added++;
+  });
+  if(added) save();
+  return {added, dup, errors};
+}
+
+function renderDict(){
+  $("#dic-count").textContent = DICT.length ? `· ${DICT.length}` : "";
+  $("#dic-tools").hidden = !DICT.length;
+  if(!DICT.length){
+    $("#dic-list").innerHTML = `<div class="row no-icon"><span class="row-body"><span class="row-desc">Todavía no has añadido ninguna palabra.</span></span></div>`;
+    return;
+  }
+  $("#dic-list").innerHTML = DICT.map((w,i)=>{
+    const long = w.k.length > 8 ? " long" : "";
+    return `<div class="row no-icon">
+      <span class="row-body" data-say="${i}" style="cursor:pointer">
+        <span class="row-title w-kana${long} kana-font">${esc(w.k)}</span>
+        <span class="row-desc w-rom">${esc(w.r)}${w.auto?'<span class="auto">auto</span>':""} · ${esc(w.m)}</span></span>
+      <button class="spk" data-say="${i}">🔊</button>
+      <button class="del" data-del="${i}" title="Eliminar">✕</button></div>`;
+  }).join("");
+  $$("#dic-list [data-say]").forEach(b=>b.addEventListener("click",()=>speak(DICT[+b.dataset.say].k, true)));
+  $$("#dic-list [data-del]").forEach(b=>b.addEventListener("click",()=>{
+    DICT.splice(+b.dataset.del,1); save(); renderDict(); renderHome();
+  }));
+}
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
 /* ---------- Copia de seguridad ---------- */
 function buildBackup(){
-  return {app:"kana-flashcards", v:2, exported:new Date().toISOString(),
-          settings:S, progress:P, records:R, days:DY};
+  return {app:"kana-flashcards", v:3, exported:new Date().toISOString(),
+          settings:S, progress:P, records:R, days:DY, misses:MISS, dict:DICT};
 }
 function renderBackup(){
   $("#bk-out").value = JSON.stringify(buildBackup());
   $("#bk-note-out").textContent = `${Object.keys(P).length} caracteres practicados, ${Object.keys(R).length} récords y ${DY.length} días.`;
   $("#bk-note-out").className = "note";
   $("#bk-note-in").textContent = ""; $("#bk-note-in").className = "note";
+  $("#dic-out").value = dicJSON();
+  $("#dic-note-bk").textContent = ""; $("#dic-note-bk").className = "note";
 }
 function readBackup(){
   const txt = $("#bk-in").value.trim();
   if(!txt) throw new Error("Pega el contenido de una copia o elige un archivo.");
   let o; try{ o = JSON.parse(txt); }catch(e){ throw new Error("Eso no es un JSON válido."); }
-  if(!o || typeof o!=="object" || (!o.progress && !o.records && !o.days))
+  if(!o || typeof o!=="object" || (!o.progress && !o.records && !o.days && !o.dict))
     throw new Error("El archivo no parece una copia de esta app.");
   return o;
 }
@@ -1290,9 +1605,11 @@ function applyBackup(o, mode){
     inProg[k] = {box:Math.max(0,Math.min(5,+v.box||0)), ok:Math.max(0,+v.ok||0), ko:Math.max(0,+v.ko||0)};
   }
   const inDays = (o.days||[]).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d));
+  const inMiss = (o.misses||[]).filter(k=>valid.has(k));
+  const inDict = sanitizeDict(o.dict);
 
   if(mode==="replace"){
-    P = inProg; R = {}; DY = inDays.sort();
+    P = inProg; R = {}; DY = inDays.sort(); MISS = inMiss; DICT = inDict;
     for(const k in (o.records||{})) if(typeof o.records[k]==="number") R[k] = o.records[k];
     if(o.settings) S = Object.assign(JSON.parse(JSON.stringify(DEF_SETTINGS)), o.settings,
       {sets:Object.assign({}, DEF_SETTINGS.sets, o.settings.sets||{})});
@@ -1305,9 +1622,31 @@ function applyBackup(o, mode){
     for(const k in (o.records||{}))
       if(typeof o.records[k]==="number") R[k] = Math.max(R[k]||0, o.records[k]);
     DY = [...new Set([...DY, ...inDays])].sort();
+    MISS = [...new Set([...MISS, ...inMiss])].slice(0,30);
+    mergeDict(inDict);
   }
   save();
   return Object.keys(inProg).length;
+}
+
+function sanitizeDict(arr){
+  if(!Array.isArray(arr)) return [];
+  const out = [], seen = new Set();
+  for(const e of arr){
+    if(!e || typeof e!=="object") continue;
+    const k = String(e.k||"").trim(), m = String(e.m||"").trim();
+    if(!k || !m || seen.has(k)) continue;
+    let r = String(e.r||"").trim(), auto = !!e.auto;
+    if(!r){ if(!isKanaOnly(k)) continue; r = kanaToRomaji(k); auto = true; }
+    seen.add(k); out.push({k, r, m, auto});
+  }
+  return out;
+}
+function mergeDict(list){
+  const have = new Set(DICT.map(e=>e.k));
+  let n = 0;
+  for(const e of list) if(!have.has(e.k)){ have.add(e.k); DICT.push(e); n++; }
+  return n;
 }
 
 function renderSettings(){
@@ -1316,6 +1655,17 @@ function renderSettings(){
   $$("#set-answer button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.val===S.answerMode));
   $$("#set-grid button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.val===S.gridContrast));
   $$("#set-rate button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.val===S.rate));
+  $("#set-smooth").setAttribute("aria-checked", S.smoothInk);
+  $("#set-ink").innerHTML = INKS.map(c=>{
+    const bg = c==="auto" ? "var(--label)" : c;
+    return `<button class="sw" data-ink="${c}" style="background:${bg}" aria-pressed="${c===S.inkColor}"
+      title="${c==="auto"?"Tinta, sigue el tema":c}"></button>`;
+  }).join("");
+  $$("#set-ink .sw").forEach(b=>b.addEventListener("click",()=>{
+    S.inkColor = b.dataset.ink; save();
+    $$("#set-ink .sw").forEach(x=>x.setAttribute("aria-pressed", x.dataset.ink===S.inkColor));
+    redrawStrokes();
+  }));
   $("#set-audio").setAttribute("aria-checked", S.audio);
   $("#set-hard").setAttribute("aria-checked", S.hardOptions);
   renderVoices();
@@ -1390,12 +1740,13 @@ document.addEventListener("click", e=>{
   }
 });
 $("#set-audio").addEventListener("click", ()=>{ S.audio=!S.audio; $("#set-audio").setAttribute("aria-checked",S.audio); if(S.audio) speak("こんにちは"); save(); });
+$("#set-smooth").addEventListener("click", ()=>{ S.smoothInk=!S.smoothInk; $("#set-smooth").setAttribute("aria-checked",S.smoothInk); save(); redrawStrokes(); });
 $("#set-hard").addEventListener("click", ()=>{ S.hardOptions=!S.hardOptions; $("#set-hard").setAttribute("aria-checked",S.hardOptions); save(); });
 $("#set-voice").addEventListener("change", e=>{ S.voiceURI = e.target.value; save(); speak("こんにちは", true); });
 $("#voice-test").addEventListener("click", ()=> speak("あいうえお", true));
 $("#ta-secs").addEventListener("change", renderRecords);
 $("#sv-secs").addEventListener("change", renderRecords);
-$("#btn-reset").addEventListener("click", ()=>{ if(confirm("Se borrarán el mapa de dominio, los récords y el calendario. ¿Seguir?")){ P={}; R={}; DY=[]; save(); renderProgress(); } });
+$("#btn-reset").addEventListener("click", ()=>{ if(confirm("Se borrarán el mapa de dominio, los récords y el calendario. Tu diccionario no se toca. ¿Seguir?")){ P={}; R={}; DY=[]; MISS=[]; save(); renderProgress(); } });
 
 /* ---------- Eventos de la copia de seguridad ---------- */
 const noteOut = (msg, cls)=>{ const n=$("#bk-note-out"); n.textContent=msg; n.className="note "+(cls||""); };
@@ -1441,11 +1792,66 @@ function doImport(mode){
   renderSettings();
 }
 $("#bk-merge").addEventListener("click", ()=>doImport("merge"));
+
+/* ---------- Eventos del diccionario ---------- */
+$("#dic-add").addEventListener("click", ()=>{
+  const {added, dup, errors} = addToDict($("#dic-in").value);
+  const partes = [];
+  if(added) partes.push(`${added} ${added===1?"palabra añadida":"palabras añadidas"}`);
+  if(dup) partes.push(`${dup} ya estaban`);
+  const n = $("#dic-note");
+  n.innerHTML = [partes.join(", "), ...errors].filter(Boolean).map(esc).join("<br>");
+  n.className = "note " + (errors.length ? (added ? "" : "err") : "ok");
+  if(added){ $("#dic-in").value = ""; renderDict(); renderHome(); }
+});
+$("#dic-clear-in").addEventListener("click", ()=>{ $("#dic-in").value=""; $("#dic-note").textContent=""; });
+$("#dic-wipe").addEventListener("click", ()=>{
+  if(!confirm(`Se borrarán las ${DICT.length} palabras de tu diccionario. ¿Seguir?`)) return;
+  DICT = []; save(); renderDict(); renderHome();
+});
+
+const dicJSON = () => JSON.stringify({app:"kana-flashcards", type:"dict", v:1, exported:new Date().toISOString(), dict:DICT});
+$("#dic-copy").addEventListener("click", async ()=>{
+  const ta = $("#dic-out");
+  try{ await navigator.clipboard.writeText(ta.value); noteDic("Diccionario copiado.", "ok"); }
+  catch(e){ ta.focus(); ta.select(); let d=false; try{ d=document.execCommand("copy"); }catch(_){}
+    noteDic(d?"Diccionario copiado.":"No pude copiar. El texto está seleccionado: cópialo a mano.", d?"ok":"err"); }
+});
+$("#dic-down").addEventListener("click", ()=>{
+  try{
+    const blob = new Blob([$("#dic-out").value], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = `kana-diccionario-${dayKey()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    noteDic("Archivo descargado.", "ok");
+  }catch(e){ noteDic("Este navegador no permite la descarga. Usa Copiar.", "err"); }
+});
+$("#dic-file").addEventListener("change", e=>{
+  const f = e.target.files && e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{ $("#dic-imp").value = rd.result; noteDic(`Archivo cargado: ${f.name}.`); };
+  rd.onerror = ()=> noteDic("No pude leer el archivo.", "err");
+  rd.readAsText(f); e.target.value = "";
+});
+$("#dic-merge").addEventListener("click", ()=>{
+  const txt = $("#dic-imp").value.trim();
+  if(!txt) return noteDic("Pega un diccionario o elige un archivo.", "err");
+  let o; try{ o = JSON.parse(txt); }catch(err){ return noteDic("Eso no es un JSON válido.", "err"); }
+  const list = sanitizeDict(Array.isArray(o) ? o : o.dict);
+  if(!list.length) return noteDic("No encontré palabras válidas en ese archivo.", "err");
+  const n = mergeDict(list);
+  save(); renderBackup(); renderHome();
+  noteDic(n ? `${n} ${n===1?"palabra añadida":"palabras añadidas"}. Ahora tienes ${DICT.length}.`
+            : "Ya tenías todas esas palabras.", "ok");
+});
+const noteDic = (msg, cls)=>{ const n=$("#dic-note-bk"); n.textContent=msg; n.className="note "+(cls||""); };
 $("#bk-replace").addEventListener("click", ()=>doImport("replace"));
 
 document.addEventListener("keydown", e=>{
   if(!$("#sheet-back").hidden){ if(e.key==="Escape") closeSheet(); return; }
   if($("#s-study").classList.contains("active") && G){
+    if(G.lock && G.mode==="study" && (e.key==="Enter" || e.key===" ")){ e.preventDefault(); advance(); return; }
     if(e.key>="1" && e.key<="4"){ const b=stage.querySelector(`.opt[data-i="${+e.key-1}"]`); if(b && !b.disabled) b.click(); }
     if(e.key==="Escape"){ G.n ? endGame() : show("s-home"); }
   } else if(e.key==="Escape"){ show("s-home"); }
@@ -1453,7 +1859,7 @@ document.addEventListener("keydown", e=>{
 
 /* ---------- Arranque ---------- */
 (async function init(){
-  const [s,p,r,dy] = await Promise.all([Store.get("hira_settings"),Store.get("hira_progress"),Store.get("hira_records"),Store.get("hira_days")]);
+  const [s,p,r,dy,ms,dc] = await Promise.all([Store.get("hira_settings"),Store.get("hira_progress"),Store.get("hira_records"),Store.get("hira_days"),Store.get("hira_misses"),Store.get("hira_dict")]);
   if(s){
     S = Object.assign(JSON.parse(JSON.stringify(DEF_SETTINGS)), s, {sets:Object.assign({},DEF_SETTINGS.sets,s.sets||{})});
     // la vista de la hoja pasó de booleano a tres modos
@@ -1463,6 +1869,8 @@ document.addEventListener("keydown", e=>{
   if(p) P = p;
   if(r) R = r;
   if(Array.isArray(dy)) DY = dy;
+  if(Array.isArray(ms)) MISS = ms;
+  DICT = sanitizeDict(dc);
   applyTheme();
   applyGrid();
   renderHome();
